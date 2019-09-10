@@ -1,6 +1,8 @@
 # Jrtplib4Android
 基于开源项目jrtplib，自主编译出jni依赖库，在Android平台上实现RTP/RTCP数据接收、发送等示例。（包含H264数据分包发送）
 
+本人采用的是android-ndk-r14b，并不是as自带的。（自带的会出现各种异常）
+
 ## jni目录编译项目
 ### 接收端实现的功能：
   1、接收rtp数据，回调数据至java(目前只有byte[],length,isMarker,可根据需求自行修改)；<br>
