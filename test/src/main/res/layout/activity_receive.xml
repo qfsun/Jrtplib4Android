@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/ll_rtsp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <CheckBox
+            android:id="@+id/cb_rtsp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="接收转发RTSP" />
+
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/et_rtsp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="rtsp地址"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_dest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll_rtsp"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="目标地址：" />
+
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/et_dest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint=" ip : port " />
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/btn_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll_dest"
+        android:layout_marginTop="20dp"
+        android:text="开始" />
+
+    <TextView
+        android:id="@+id/tv_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/btn_start"
+        android:scrollbars="vertical" />
+
+</RelativeLayout>
