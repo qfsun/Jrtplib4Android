@@ -28,6 +28,8 @@ public class RtspStatus {
     //关闭
     public final static int TEARDOWN = 6;
 
+    public final static int ERROR = 7;
+
     /**
      * 获取当前状态值的字符串，方便调试查看
      *

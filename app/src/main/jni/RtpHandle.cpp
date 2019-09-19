@@ -2,11 +2,10 @@
 #include "RtpReceiver.h"
 #include "RtpSender.h"
 
-CRTPReceiver *m_receive;
-CRTPSender m_send;
-bool isSend;
-bool isReceive;
-bool isHandle;
+typedef struct {
+    long sender;
+    long receiver;
+} RtpHandle;
 
 JavaVM *g_jvm;
 
@@ -16,112 +15,154 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_4;
 }
 
-JNIEXPORT jboolean
-JNICALL Java_com_wtoe_jrtplib_RtpHandle_initSendHandle
-        (JNIEnv *env, jclass type, jint localport, jstring desthost_, jint destport,
+extern "C"
+JNIEXPORT jlong JNICALL Java_com_wtoe_jrtplib_RtpHandle_initSendHandle
+        (JNIEnv *env, jclass type, jint _localport, jstring _desthost, jint _destport,
          jobject listener) {
-    if (isSend) {
-        logd("Send Handle already init!");
-        return true;
+    //创建Handle
+    RtpHandle *handle = new RtpHandle();
+
+    //创建发送端
+    CRTPSender *crtpSender = new CRTPSender;
+
+    //转换远端IP
+    const char *desthost = env->GetStringUTFChars(_desthost, 0);
+
+    //初始化发送端参数
+    bool flag = crtpSender->initParam(g_jvm,env,crtpSender, desthost, _localport, _destport,
+                                      listener);
+    //释放资源
+    env->ReleaseStringUTFChars(_desthost, desthost);
+    //如果初始化失败，删除资源
+    if (!flag) {
+        delete crtpSender;
+        delete handle;
+        return 0;
     }
-    const char *host = env->GetStringUTFChars(desthost_, 0);
-
-    isSend = m_send.initParam(g_jvm, m_send, host, localport, destport, env, listener);
-    env->ReleaseStringUTFChars(desthost_, host);
-    return isSend;
-}
-
-JNIEXPORT jboolean
-JNICALL Java_com_wtoe_jrtplib_RtpHandle_initReceiveHandle
-        (JNIEnv *env, jclass type, jstring localhost_, jint localport, jobject listener) {
-    if (isReceive) {
-        logd("Receive Handle already init!");
-        return true;
-    }
-    const char *host = env->GetStringUTFChars(localhost_, 0);
-
-    isReceive = m_receive->init(g_jvm, host, localport, env, listener);
-    env->ReleaseStringUTFChars(localhost_, host);
-    return isReceive;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_wtoe_jrtplib_RtpHandle_initReceiveAndSendHandle(JNIEnv *env, jclass type,
-                                                            jstring localhost_, jint localport,
-                                                            jstring desthost_, jint destport,
-                                                            jobject listener) {
-    if (isHandle) {
-        logd("ReceiveAndSend Handle  already init!");
-        return true;
-    }
-    const char *localhost = env->GetStringUTFChars(localhost_, 0);
-    const char *desthost = env->GetStringUTFChars(desthost_, 0);
-
-    // TODO
-    //发送端也需要占用端口，不能与接收端一致
-    isSend = m_send.initParam(g_jvm, m_send, desthost, localport + 2, destport, env, listener);
-    isReceive = m_receive->init(g_jvm, localhost, localport, env, listener);
-    env->ReleaseStringUTFChars(localhost_, localhost);
-    env->ReleaseStringUTFChars(desthost_, desthost);
-
-    if (isSend && isReceive) {
-        isHandle = true;
-    }
-    return isHandle;
+    handle->sender = (jlong) crtpSender;
+    logd("%s Sender.  addr:%ld\n", "InitSendHandle", (jlong) crtpSender);
+    logd("%s Handle.  addr:%ld\n", "InitSendHandle", (jlong) handle);
+    return (jlong) handle;
 }
 
 extern "C"
-JNIEXPORT jboolean
-JNICALL
-Java_com_wtoe_jrtplib_RtpHandle_sendH264Byte(JNIEnv *env, jclass type, jbyteArray src_,
-                                                jint byteLength, jboolean isSpsOrPps) {
-    jbyte *src = env->GetByteArrayElements(src_, NULL);
-    // TODO
-    if (isSend) {
-        m_send.SendH264Nalu((unsigned char *) (src), byteLength, isSpsOrPps);
-    } else {
-        logd("Send Handle not init!");
-        env->ReleaseByteArrayElements(src_, src, 0);
+JNIEXPORT jlong JNICALL Java_com_wtoe_jrtplib_RtpHandle_initReceiveAndSendHandle
+        (JNIEnv *env, jclass type, jstring _localhost, jint _localport, jstring _desthost,
+         jint _destport, jobject listener) {
+    //创建Handle
+    RtpHandle *handle = new RtpHandle();
+
+    //创建发送端
+    CRTPSender *crtpSender = new CRTPSender;
+
+    //转换远端IP
+    const char *desthost = env->GetStringUTFChars(_desthost, 0);
+
+    //初始化发送端参数
+    bool flag = crtpSender->initParam(g_jvm,env,crtpSender, desthost, _localport + 2, _destport,
+                                      listener);
+    //释放资源
+    env->ReleaseStringUTFChars(_desthost, desthost);
+
+    //如果初始化失败，删除资源
+    if (!flag) {
+        delete crtpSender;
+        delete handle;
+        return 0;
+    }
+    handle->sender = (jlong) crtpSender;
+
+    //创建接收端
+    CRTPReceiver *crtpReceiver = new CRTPReceiver;
+
+    //转换本地IP
+    const char *localhost = env->GetStringUTFChars(_localhost, 0);
+
+    //初始化接收端参数
+    bool flag_receive = crtpReceiver->init(g_jvm,env,crtpReceiver, localhost, _localport,listener);
+    //释放资源
+    env->ReleaseStringUTFChars(_localhost, localhost);
+
+    //如果初始化失败，删除资源
+    if (!flag_receive) {
+        delete crtpReceiver;
+        delete handle;
+        return 0;
+    }
+    handle->receiver = (jlong) crtpReceiver;
+    return (jlong) handle;
+}
+
+int m_Count;
+
+extern "C"
+JNIEXPORT jboolean JNICALL Java_com_wtoe_jrtplib_RtpHandle_sendByte
+        (JNIEnv *env, jclass type, jlong rtpHandler, jbyteArray _src, jint _byteLength,
+         jboolean isSpsOrMarker, jboolean isRtpData) {
+    //如果rtpHandler=0，直接返回，不处理
+    if (rtpHandler == 0) {
         return false;
     }
-    env->ReleaseByteArrayElements(src_, src, 0);
-    return true;
-}
 
-extern "C"
-JNIEXPORT jboolean
-JNICALL
-Java_com_wtoe_jrtplib_RtpHandle_sendRtpByte(JNIEnv *env, jclass type, jbyteArray src_,
-                                               jint byteLength, jboolean isMarker) {
-    jbyte *src = env->GetByteArrayElements(src_, NULL);
-    // TODO
-    if (isSend) {
-        m_send.SendRtpData((unsigned char *) (src), byteLength, isMarker);
-    } else {
-        logd("Send Handle not init!");
-        env->ReleaseByteArrayElements(src_, src, 0);
+    //强转拿到rtpHandler
+    RtpHandle *handle = (RtpHandle *) rtpHandler;
+    //如果强转值为null，删除对象资源，并返回
+    if (handle == NULL) {
+        delete handle;
         return false;
     }
-    env->ReleaseByteArrayElements(src_, src, 0);
+    //如果不存在发送端，则返回
+    if (handle->sender == 0) {
+        logd("sender = 0 , send error!");
+        return false;
+    }
+
+    if (m_Count % 100 == 0) {
+        logd("RtpHandle sendByte sender addr : %d \n", handle->sender);
+        m_Count = 0;
+    }
+    m_Count++;
+    CRTPSender *crtpSender = (CRTPSender *) (handle->sender);
+    jbyte *src = env->GetByteArrayElements(_src, NULL);
+    if (isRtpData) {
+        crtpSender->SendRtpData((unsigned char *) src, _byteLength, isSpsOrMarker);
+    } else {
+        crtpSender->SendH264Nalu((unsigned char *) src, _byteLength, isSpsOrMarker);
+    }
+    env->ReleaseByteArrayElements(_src, src, 0);
     return true;
 }
 
 extern "C"
-JNIEXPORT jboolean
-JNICALL
-Java_com_wtoe_jrtplib_RtpHandle_finiRtp(JNIEnv *env, jclass type) {
-    // TODO
-    if (isSend) {
-        m_send.fini();
-        isSend = false;
+JNIEXPORT jboolean JNICALL Java_com_wtoe_jrtplib_RtpHandle_finiHandle
+        (JNIEnv *env, jclass type, jlong rtpHandler) {
+    if (rtpHandler == 0) {
+        return false;
     }
-    if (isReceive) {
-        m_receive->fini(env);
-        isReceive = false;
+    RtpHandle *handle = (RtpHandle *) rtpHandler;
+    if (handle == NULL) {
+        delete handle;
+        return false;
     }
-    if (isHandle) {
-        isHandle = false;
+    logd("%s Handle.  addr:%ld\n", "finiHandle",rtpHandler);
+    if (handle->sender != 0) {
+        logd("%s Sender.  addr:%ld\n", "finiHandle", handle->sender);
+        CRTPSender *crtpSender = (CRTPSender *) (handle->sender);
+        if (crtpSender != NULL) {
+            crtpSender->fini();
+        }
+        handle->sender = 0;
+        delete crtpSender;
     }
-    return true;
+    if (handle->receiver != 0) {
+        logd("%s Receiver.  addr:%ld\n", "finiHandle", handle->receiver);
+        CRTPReceiver *crtpReceiver = (CRTPReceiver *) (handle->receiver);
+        if (crtpReceiver != NULL) {
+            crtpReceiver->fini(env);
+        }
+        handle->receiver = 0;
+        delete crtpReceiver;
+    }
+    delete handle;
 }
+

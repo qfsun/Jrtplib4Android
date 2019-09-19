@@ -13,7 +13,7 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE    := rtp-handle
-LOCAL_SRC_FILES := RtpHandle.cpp RtpReceiver.cpp RtpSender.cpp RtpCommon.cpp
+LOCAL_SRC_FILES := RtpHandle.cpp  RtpReceiver.cpp RtpSender.cpp RtpCommon.cpp
 LOCAL_STATIC_LIBRARIES := jthread jrtp
 LOCAL_LDLIBS := -llog
 

@@ -1,23 +1,9 @@
-#include <RtpSender.h>
 #include "RtpSender.h"
 
-
 #define MAX_RTP_PKT_LENGTH 1300
-#define SEND_LENGTH 1400
+#define SEND_LENGTH        1400
 #define H264               96
-#define SSRC           100
-
-bool s_init;
-uint32_t s_remoteIp;
-uint16_t s_remotePort;
-int mCount = 0;
-
-JavaVM *s_vm;
-JNIEnv *s_env;
-jobject s_jobj = NULL;
-bool s_pollThreadExited;
-
-SendCallback *s_callback;
+#define SSRC               100
 
 SendCallback::SendCallback(_JNIEnv *env, jobject obj) {
     jobj = obj;
@@ -39,70 +25,20 @@ SendCallback::SendCallback(_JNIEnv *env, jobject obj) {
 }
 
 //回调java监听
-void callbackRtcp(int r_type, uint32_t r_ip, SendCallback *hid_callback) {
-    if (NULL == s_env && s_init) {
-        int status = s_vm->GetEnv((void **) &s_env, JNI_VERSION_1_4);
-        if (status < 0) {
-            status = s_vm->AttachCurrentThread(&s_env, NULL);
-            loge(" AttachCurrentThread !\n");
-            if (status < 0) {
-                s_env = NULL;
-            }
-        } else {
-        }
-    }
-    if (NULL != s_env) {
-        if (s_init) {
-            //没有主动调用停止，才可以回调数据
-            if (r_type == 1) {
-                char *string = changeIP(r_ip);
-                s_env->CallVoidMethod(hid_callback->jobj, hid_callback->jmid_rtcp,
-                                      s_env->NewStringUTF(string));
-            } else if (r_type == 2) {
-                char *string = changeIP(r_ip);
-                s_env->CallVoidMethod(hid_callback->jobj, hid_callback->jmid_bye,
-                                      s_env->NewStringUTF(string));
-            }
-        } else {
-            //如果线程没有停止，就调用Detach，会报错。
-            if (s_pollThreadExited) {
-                loge(" DetachCurrentThread !\n");
-                s_vm->DetachCurrentThread();
-                s_env = NULL;
-                return;
-            }
+void callbackRtcp(JNIEnv *env, int r_type, uint32_t r_ip, SendCallback *hid_callback) {
+    if (NULL != env) {
+        //没有主动调用停止，才可以回调数据
+        if (r_type == 1) {
+            char *string = changeIP(r_ip);
+            env->CallVoidMethod(hid_callback->jobj, hid_callback->jmid_rtcp,
+                                env->NewStringUTF(string));
+        } else if (r_type == 2) {
+            char *string = changeIP(r_ip);
+            env->CallVoidMethod(hid_callback->jobj, hid_callback->jmid_bye,
+                                env->NewStringUTF(string));
         }
     }
 }
-
-typedef struct {
-    //byte 0
-    unsigned char TYPE:5;
-    unsigned char NRI:2;
-    unsigned char F:1;
-} NALU_HEADER; /**//* 1 BYTES */
-
-typedef struct {
-    //byte 0
-    unsigned char TYPE:5;
-    unsigned char NRI:2;
-    unsigned char F:1;
-} FU_INDICATOR; /**//* 1 BYTES */
-
-typedef struct {
-    //byte 0
-    unsigned char TYPE:5;
-    unsigned char R:1;
-    unsigned char E:1;
-    unsigned char S:1;
-} FU_HEADER; /**//* 1 BYTES */
-
-NALU_HEADER *nalu_hdr;
-FU_INDICATOR *fu_ind;
-FU_HEADER *fu_hdr;
-
-int FindStartCode2(unsigned char *Buf);//查找开始字符0x000001
-int FindStartCode3(unsigned char *Buf);//查找开始字符0x00000001
 
 void CRTPSender::OnRTCPCompoundPacket(RTCPCompoundPacket *pack, const RTPTime &receivetime,
                                       const RTPAddress *senderaddress) {
@@ -111,13 +47,15 @@ void CRTPSender::OnRTCPCompoundPacket(RTCPCompoundPacket *pack, const RTPTime &r
     uint32_t rtcpIp = addr->GetIP();
     uint32_t port = addr->GetPort();
     logd(" OnRTCP. ip:0x%x port:%d\n", rtcpIp, port);
-    callbackRtcp(1, rtcpIp, s_callback);
+    if (s_init && s_isAttach){
+        callbackRtcp(s_env, 1, rtcpIp, s_callback);
+    }
 }
 
 bool
-CRTPSender::initParam(JavaVM *vm, CRTPSender &sess, const char *host, uint16_t PORT_BASE,
-                      uint16_t DST_PORT, JNIEnv *env, jobject listener) {
-    logd("init jni!\n");
+CRTPSender::initParam(JavaVM *vm,JNIEnv *env,CRTPSender *sess, const char *host, uint16_t PORT_BASE,
+                      uint16_t DST_PORT, jobject listener) {
+    logd("CRTPSender init jni!\n");
     if (s_init) {
         loge("CRTPReceiver already init. \n");
         return false;
@@ -125,17 +63,17 @@ CRTPSender::initParam(JavaVM *vm, CRTPSender &sess, const char *host, uint16_t P
     if (s_jobj == NULL) {
         s_jobj = env->NewGlobalRef(listener);
     }
-    s_vm = vm;
+    s_env = env;
     s_callback = new SendCallback(env, s_jobj);
+    s_vm = vm;
     env->GetJavaVM(&s_vm);//保存全局变量
-
     int status;
     //RTP+RTCP库初始化SOCKET环境
     RTPUDPv4TransmissionParams transparams;
     RTPSessionParams sessparams;
 
     if (sessparams.SetUsePollThread(true) < 0) {
-        loge("CRTPReceiver init failed. SetUsePollThread error. \n");
+        loge("CRTPSender init failed. SetUsePollThread error. \n");
         return false;
     }
     /* set h264 param */
@@ -146,30 +84,38 @@ CRTPSender::initParam(JavaVM *vm, CRTPSender &sess, const char *host, uint16_t P
 
     transparams.SetPortbase(PORT_BASE);
 
-    status = sess.Create(sessparams, &transparams);
+    status = sess->Create(sessparams, &transparams);
     CheckError(status);
+    if (status < 0) {
+        loge("CRTPSender init failed. Create(sessparams, &transparams). \n");
+        return false;
+    }
 
     uint32_t destip = inet_addr(host);
     destip = ntohl(destip);
     s_remoteIp = destip;
     s_remotePort = DST_PORT;
     RTPIPv4Address addr(destip, DST_PORT);
-    status = sess.AddDestination(addr);
+    status = sess->AddDestination(addr);
     CheckError(status);
+    if (status < 0) {
+        loge("CRTPSender init failed. AddDestination(addr). \n");
+        return false;
+    }
     s_init = true;
     //为发送H264包设置参数
-    sess.SetParamsForSendingH264();
-    logd("init jni ok.\n");
+    sess->SetParamsForSendingH264();
+    logd("CRTPSender init jni ok.\n");
     return true;
 }
 
 bool CRTPSender::fini() {
-    loge("fini jni!\n");
+    loge("CRTPSender fini jni!\n");
     RTPIPv4Address addr(s_remoteIp, s_remotePort);
     DeleteFromAcceptList(addr);
     s_init = false;
     BYEDestroy(RTPTime(10, 0), 0, 0);
-    loge("fini jni ok.\n");
+    loge("CRTPSender fini jni ok.\n");
     return true;
 }
 
@@ -180,15 +126,15 @@ void CRTPSender::OnNewSource(RTPSourceData *srcdat) {
         const RTPIPv4Address *addr = (const RTPIPv4Address *) (srcdat->GetRTPDataAddress());
         ip = addr->GetIP();
         port = addr->GetPort();
-        logd("%s RTP. ip:0x%x port:%d\n", "OnNewSource", ip, port);
+        logd("%s CRTPSender RTP. ip:0x%x port:%d\n", "OnNewSource", ip, port);
     } else if (srcdat->GetRTCPDataAddress() != 0) {
         const RTPIPv4Address *addr = (const RTPIPv4Address *) (srcdat->GetRTCPDataAddress());
         ip = addr->GetIP();
         port = addr->GetPort();
-        logd("%s RTCP. ip:0x%x port:%d\n", "OnNewSource", ip, port);
+        logd("%s CRTPSender RTCP. ip:0x%x port:%d\n", "OnNewSource", ip, port);
         port = port - 1;
     } else {
-        logd("%s RTP/RTCP. error \n", "OnNewSource");
+        logd("%s CRTPSender RTP/RTCP. error \n", "OnNewSource");
         return;
     }
     if (ip != s_remoteIp || port != s_remotePort) {
@@ -199,14 +145,31 @@ void CRTPSender::OnNewSource(RTPSourceData *srcdat) {
 }
 
 void CRTPSender::OnPollThreadStart(bool &stop) {
-    logd("CRTPReceiver  OnPollThreadStart\n");
-    s_pollThreadExited = false;
+    logd("CRTPSender  OnPollThreadStart\n");
+    int status = s_vm->AttachCurrentThread(&s_env, NULL);
+    if (status < 0) {
+        s_isAttach = false;
+        s_env = NULL;
+        loge("CRTPSender AttachCurrentThread Error!\n");
+        return;
+    }
+    s_isAttach = true;
+    loge("CRTPSender AttachCurrentThread Ok!\n");
 }
 
 void CRTPSender::OnPollThreadStop() {
-    logd("CRTPReceiver  OnPollThreadStop\n");
-    s_pollThreadExited = true;
-    callbackRtcp(0, false, s_callback);
+    logd("CRTPSender  OnPollThreadStop\n");
+    //如果线程没有停止，就调用Detach，会报错。
+    s_isAttach = false;
+    if (s_env != NULL) {
+        int status = s_vm->DetachCurrentThread();
+        if (status < 0) {
+            loge("CRTPSender DetachCurrentThread Error!\n");
+        } else {
+            loge("CRTPSender DetachCurrentThread Ok!\n");
+        }
+        s_env = NULL;
+    }
 }
 
 void CRTPSender::SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOrPps) {
@@ -227,7 +190,7 @@ void CRTPSender::SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOr
     memset(sendbuf, 0, SEND_LENGTH);
     int status;
     if (mCount % 100 == 0) {
-        logd("SendH264Nalu packet length %d \n", buflen);
+        logd("CRTPSender SendH264Nalu packet length %d \n", buflen);
         mCount = 0;
     }
     mCount++;
@@ -329,9 +292,10 @@ void CRTPSender::SendRtpData(unsigned char *m_rtpBuf, int buflen, bool isMarker)
         return;
     }
     if (mCount % 100 == 0) {
-        logd("SendRtpData packet length %d \n", buflen);
+        logd("CRTPSender SendRtpData packet length %d \n", buflen);
         mCount = 0;
     }
+    mCount++;
     int status;
     this->SetMaximumPacketSize(1500);
     if (isMarker) {
@@ -351,33 +315,35 @@ void CRTPSender::SetParamsForSendingH264() {
 }
 
 void CRTPSender::OnBYEPacket(RTPSourceData *srcdat) {
-    logd("OnBYEPacket >>>> ");
+    logd("CRTPSender OnBYEPacket >>>> ");
     uint32_t ip = 0;
     uint16_t port = 0;
     if (srcdat->GetRTPDataAddress() != 0) {
         const RTPIPv4Address *addr = (const RTPIPv4Address *) (srcdat->GetRTPDataAddress());
         ip = addr->GetIP();
         port = addr->GetPort();
-        logd("RTP. ip:0x%x port:%d\n", ip, port);
+        logd("CRTPSender RTP. ip:0x%x port:%d\n", ip, port);
     } else if (srcdat->GetRTCPDataAddress() != 0) {
         const RTPIPv4Address *addr = (const RTPIPv4Address *) (srcdat->GetRTCPDataAddress());
         ip = addr->GetIP();
         port = addr->GetPort();
-        logd("RTCP. ip:0x%x port:%d\n", ip, port);
+        logd("CRTPSender RTCP. ip:0x%x port:%d\n", ip, port);
         port = port - 1;
     } else {
-        logd("%s RTP/RTCP. error \n", "OnBYEPacket");
+        logd("%s CRTPSender RTP/RTCP. error \n", "OnBYEPacket");
         return;
     }
-    callbackRtcp(2, ip, s_callback);
+    if (s_init && s_isAttach){
+        callbackRtcp(s_env, 2, ip, s_callback);
+    }
 }
 
-int FindStartCode2(unsigned char *Buf) {
+int CRTPSender::FindStartCode2(unsigned char *Buf) {
     if (Buf[0] != 0 || Buf[1] != 0 || Buf[2] != 1) return 0; //判断是否为0x000001,如果是返回1
     else return 1;
 }
 
-int FindStartCode3(unsigned char *Buf) {
+int CRTPSender::FindStartCode3(unsigned char *Buf) {
     if (Buf[0] != 0 || Buf[1] != 0 || Buf[2] != 0 || Buf[3] != 1) return 0;//判断是否为0x00000001,如果是返回1
     else return 1;
 }

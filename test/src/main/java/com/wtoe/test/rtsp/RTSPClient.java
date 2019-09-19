@@ -145,6 +145,8 @@ public class RTSPClient extends Thread implements IEvent {
         }
     }
 
+    private int errorTimes = 0;
+
     /**
      * 接收TCP数据
      *
@@ -155,7 +157,6 @@ public class RTSPClient extends Thread implements IEvent {
             try {
                 int len = 0;
                 int readBytes = 0;
-
                 synchronized (receiveBuf) {
                     receiveBuf.clear();
                     try {
@@ -170,8 +171,15 @@ public class RTSPClient extends Thread implements IEvent {
                         receiveBuf.get(tmp);
                         return tmp;
                     } else {
-                        System.out.println("接收到数据为空,重新启动连接");
-                        return null;
+                        if (errorTimes > 1){
+                            System.out.println("RTSP TCP >>> 接收到数据为空,重新启动连接.");
+                            return null;
+                        }else {
+                            errorTimes++;
+                            byte[] tmp = new byte[readBytes];
+                            System.out.println("RTSP TCP >>> 接收到数据为空.");
+                            return tmp;
+                        }
                     }
                 }
             } catch (final IOException e) {
@@ -298,6 +306,9 @@ public class RTSPClient extends Thread implements IEvent {
         if (msg != null) {
             handle(msg);
         } else {
+            if (rtspListener != null) {
+                rtspListener.setOnRtspEventListener(this,sysStatus);
+            }
             key.cancel();
         }
     }

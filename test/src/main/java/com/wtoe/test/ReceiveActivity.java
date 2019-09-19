@@ -11,18 +11,9 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import com.wtoe.jrtplib.RtpHandle;
-import com.wtoe.test.rtsp.RTSPClient;
-import com.wtoe.test.rtsp.RtspEventListener;
-import com.wtoe.test.rtsp.RtspStatus;
+public class ReceiveActivity extends AppCompatActivity {
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.ArrayBlockingQueue;
-
-public class ReceiveActivity extends AppCompatActivity implements RtpListener, RtspEventListener {
-
-    private RTSPClient rtspClient;
-
+    private static final String TAG = ReceiveActivity.class.getSimpleName();
     private AppCompatEditText editText, et_rtsp;
     private Button btn;
     private TextView tv_content;
@@ -31,24 +22,10 @@ public class ReceiveActivity extends AppCompatActivity implements RtpListener, R
     //是否使用RTSP
     private boolean useRtsp = false;
 
-    private boolean isRunning = true;
-
     private SharedPreferences sp;
 
-    class RtpData {
-        private byte[] data;
-        private int length;
-        private boolean isMark;
-
-        public RtpData(byte[] data, int length, boolean isMark) {
-            this.data = data;
-            this.length = length;
-            this.isMark = isMark;
-        }
-    }
-
-    private int queueSize = 30;
-    private ArrayBlockingQueue<RtpData> rtpDataQueue = new ArrayBlockingQueue<>(queueSize);
+    private IpCameraHelper ipCameraHelper;
+    private IpCameraHelper ipCameraHelper2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,84 +92,42 @@ public class ReceiveActivity extends AppCompatActivity implements RtpListener, R
                         return;
                     }
                     btn.setText("停止");
+                    if (ipCameraHelper == null) {
+                        ipCameraHelper = new IpCameraHelper(NetworkUtil.getInstance().getLocalIp(ReceiveActivity.this), Constants.localPort, Constants.remoteIp, Constants.remotePort);
+                    }
+                    if (ipCameraHelper2 == null) {
+                        ipCameraHelper2 = new IpCameraHelper(NetworkUtil.getInstance().getLocalIp(ReceiveActivity.this), Constants.localPort+4, Constants.remoteIp, Constants.remotePort+2);
+                    }
                     //如果勾选了使用rtsp，则初始化rtsp
                     if (useRtsp) {
                         String s = et_rtsp.getText().toString().trim();
-                        initRtspClient(s);
+                        ipCameraHelper.initRtspClient(s);
+                        ipCameraHelper2.initRtspClient(s);
                     }
                     //否则使用默认的接收数据
-                    initData();
+                    ipCameraHelper.initData();
+                    ipCameraHelper2.initData();
                 } else if (btn.getText().equals("停止")) {
                     btn.setText("开始");
-                    fini();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            fini();
+                        }
+                    }).start();
                 }
             }
         });
     }
 
-    private RtpHandle rtpHandle;
-
-    private void initData() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                rtpHandle = new RtpHandle();
-                String localIp = NetworkUtil.getInstance().getLocalIp(ReceiveActivity.this);
-                LogUtil.d("Receive", "localIp:" + localIp + "  / localPort:" + Constants.localPort);
-                LogUtil.d("Receive", "remoteIp:" + Constants.remoteIp + "  / remotePort:" + Constants.remotePort);
-//                rtpHandle.initReceiveHandle(localIp, Constants.localPort, ReceiveActivity.this);
-                Constants.localPort = rtpHandle.getAvailablePort(Constants.localPort);
-                rtpHandle.initReceiveAndSendHandle(localIp, Constants.localPort, Constants.remoteIp, Constants.remotePort, ReceiveActivity.this);
-                RtpData rtpData;
-                while (isRunning) {
-                    rtpData = rtpDataQueue.poll();
-                    if (rtpData != null && rtpHandle != null) {
-                        rtpHandle.sendRtpByte(rtpData.data, rtpData.length, rtpData.isMark);
-                    }
-                    rtpData = null;
-                }
-            }
-        }).start();
-
-    }
-
-    /**
-     * 初始化RTSP客户端调试
-     */
-    private void initRtspClient(final String rtsp) {
-        if (rtsp.isEmpty() || !rtsp.startsWith("rtsp://")) {
-            LogUtil.e("initRtspClient", "rtsp地址异常");
-            return;
-        }
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //rtsp://192.168.2.195:554/av0_0
-                    String tmp = rtsp.substring(7);
-                    String[] tmp1 = tmp.split("/");
-                    String[] tmp2 = tmp1[0].split(":");
-                    rtspClient = new RTSPClient(new InetSocketAddress(
-                            tmp2[0], Integer.parseInt(tmp2[1])),
-                            new InetSocketAddress(NetworkUtil.getInstance().getLocalIp(ReceiveActivity.this), 0),
-                            rtsp, ReceiveActivity.this);
-                    rtspClient.start();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
     private void fini() {
-        isRunning = false;
-        if (rtpHandle != null) {
-            rtpHandle.finiRtp();
-            rtpHandle = null;
+        if (ipCameraHelper != null) {
+            ipCameraHelper.fini();
+            ipCameraHelper = null;
         }
-        if (rtspClient != null) {
-            rtspClient.shutdown();
-            rtspClient = null;
+        if (ipCameraHelper2 != null) {
+            ipCameraHelper2.fini();
+            ipCameraHelper2 = null;
         }
     }
 
@@ -200,86 +135,6 @@ public class ReceiveActivity extends AppCompatActivity implements RtpListener, R
     protected void onDestroy() {
         fini();
         super.onDestroy();
-    }
-
-    int mCount = 0;
-
-    @Override
-    public void receiveRtpData(byte[] rtp_data, int pkg_size, boolean isMarker) {
-        System.out.println("收到 【RTP】" + pkg_size);
-        if (isMarker && mCount % 100 == 0) {
-            addDataToText("收到 【RTP】" + pkg_size);
-            mCount = 0;
-        }
-        mCount++;
-        addDataToQueue(new RtpData(rtp_data, pkg_size, isMarker));
-//        if (rtpHandle != null) {
-//            rtpHandle.sendRtpByte(rtp_data, pkg_size, isMarker);
-//        }
-    }
-
-    private void addDataToQueue(RtpData rtpData) {
-        try {
-            if (rtpDataQueue.size() >= queueSize) {
-                rtpDataQueue.poll();
-                LogUtil.d("addDataToQueue","lost packet");
-            }
-            rtpDataQueue.offer(rtpData);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void receiveRtcpData(String remote_ip) {
-        System.out.println("收到 【RTCP】 " + " IP:" + remote_ip);
-        addDataToText("收到 【RTCP】 " + " IP:" + remote_ip);
-    }
-
-    @Override
-    public void receiveBye(String remote_ip) {
-        System.out.println("收到 【BYE】 " + " IP:" + remote_ip);
-        addDataToText("收到 【BYE】 " + " IP:" + remote_ip);
-    }
-
-    @Override
-    public void setOnRtspEventListener(RTSPClient client, int status) {
-        LogUtil.d("OnRtspEvent", "CurrentStatus: " + RtspStatus.getCurrentStatus(status));
-        if (client == null) {
-            LogUtil.d("OnRtspEvent", "rtspClient == null");
-            return;
-        }
-        switch (status) {
-            case RtspStatus.INIT:
-                client.doOption();
-                break;
-            case RtspStatus.OPTIONS:
-                client.doDescribe();
-                break;
-            case RtspStatus.DESCRIBE:
-                client.doSetup(Constants.localPort);
-                break;
-            case RtspStatus.SETUP:
-                client.doPlay();
-                break;
-            case RtspStatus.PLAY:
-
-                break;
-            case RtspStatus.PAUSE:
-
-                break;
-            case RtspStatus.TEARDOWN:
-
-                break;
-            case 10:
-                //通道被关闭
-                if (rtspClient != null) {
-                    rtspClient = null;
-                }
-                break;
-            default:
-                break;
-        }
     }
 
     /**

@@ -2,7 +2,6 @@
 #define JRTPLIB_RTPREEIVER_H
 
 #include <jni.h>
-#include <queue>
 
 #include "jthread/jthread.h"
 #include "jrtplib3/rtpsession.h"
@@ -12,6 +11,7 @@
 #include "jrtplib3/rtpsourcedata.h"
 #include "receive-callback.h"
 #include "RtpCommon.h"
+#include <arpa/inet.h>
 
 using namespace jrtplib;
 
@@ -30,10 +30,12 @@ protected:
     virtual void OnBYEPacket(RTPSourceData *srcdat);
 
     virtual void OnRTCPCompoundPacket(RTCPCompoundPacket *pack, const RTPTime &receivetime,
-                              const RTPAddress *senderaddress);
+                                      const RTPAddress *senderaddress);
 
 public:
-    bool init(JavaVM *vm,const char *destip, uint16_t PORT_BASE , JNIEnv *env, jobject listener);
+    bool
+    init(JavaVM *vm,JNIEnv *env,CRTPReceiver *receiver, const char *destip, uint16_t PORT_BASE,
+         jobject listener);
 
     bool fini(JNIEnv *env);
 
@@ -41,6 +43,17 @@ private:
     void processSourceData(RTPSourceData *srcdat, const char *funcName, bool add);
 
     void processRtpPacket(const RTPPacket *pack);
+
+private:
+    JavaVM *r_vm;
+    JNIEnv *r_env;
+    bool m_init;
+    jobject g_jobj = NULL;
+    uint16_t m_lastSeq;
+    bool m_firstSeq;
+    uint16_t m_count;
+    ReceiveCallback *hid_callback;
+    bool isAttach;
 };
 
 #endif //JRTPLIB_RTPREEIVER_H

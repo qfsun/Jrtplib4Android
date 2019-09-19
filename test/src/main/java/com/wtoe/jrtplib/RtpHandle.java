@@ -29,31 +29,21 @@ public class RtpHandle {
     /**
      * 只发送数据，不做接收处理
      */
-    public static native boolean initSendHandle(int localport, String desthost, int destport, RtpListener listener);
-
-    /**
-     * 只接收数据，不做发送处理
-     */
-    public static native boolean initReceiveHandle(String localhost, int localport, RtpListener listener);
+    public static native long initSendHandle(int localport, String desthost, int destport, RtpListener listener);
 
     /**
      * 接收数据，并转发
      */
-    public static native boolean initReceiveAndSendHandle(String localhost, int localport, String desthost, int destport, RtpListener listener);
+    public static native long initReceiveAndSendHandle(String localhost, int localport, String desthost, int destport, RtpListener listener);
 
     /**
      * 发送数据
      */
-    public static native boolean sendH264Byte(byte[] src, int byteLength, boolean isSpsOrPps);
-
-    /**
-     * 发送数据
-     */
-    public static native boolean sendRtpByte(byte[] src, int byteLength, boolean isMarker);
+    public static native boolean sendByte(long rtpHandler, byte[] src, int byteLength, boolean isSpsOrMarker, boolean isRtpData);
 
     /**
      * 销毁资源
      */
-    public static native boolean finiRtp();
+    public static native boolean finiHandle(long rtpHandler);
 
 }
