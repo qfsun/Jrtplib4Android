@@ -12,7 +12,7 @@ public interface RtpListener {
      * @param rtp_data 负载内容
      * @param pkg_size 数据长度
      */
-    void receiveRtpData(byte[] rtp_data, int pkg_size, boolean isMarker);
+    void receiveRtpData(byte[] rtp_data, int pkg_size, boolean isMarker,long lastTime);
 
     /**
      * 收到RTCP数据

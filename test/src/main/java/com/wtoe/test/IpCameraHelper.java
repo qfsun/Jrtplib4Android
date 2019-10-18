@@ -1,7 +1,5 @@
 package com.wtoe.test;
 
-import android.content.Context;
-
 import com.wtoe.jrtplib.RtpHandle;
 import com.wtoe.test.rtsp.RTSPClient;
 import com.wtoe.test.rtsp.RtspEventListener;
@@ -29,15 +27,17 @@ public class IpCameraHelper implements RtpListener, RtspEventListener {
         private byte[] data;
         private int length;
         private boolean isMark;
+        private long lastTime;
 
-        public RtpData(byte[] data, int length, boolean isMark) {
+        public RtpData(byte[] data, int length, boolean isMark, long lastTime) {
             this.data = data;
             this.length = length;
             this.isMark = isMark;
+            this.lastTime = lastTime;
         }
     }
 
-    private int queueSize = 30;
+    private int queueSize = 3000;
     private ArrayBlockingQueue<RtpData> rtpDataQueue = new ArrayBlockingQueue<>(queueSize);
 
     /**
@@ -67,20 +67,27 @@ public class IpCameraHelper implements RtpListener, RtspEventListener {
                 LogUtil.d(TAG, "localIp:" + localIP + "  / localPort:" + localPort);
                 LogUtil.d(TAG, "remoteIp:" + remoteIp + "  / remotePort:" + remotePort);
 
-                int mport = rtpHandle.getAvailablePort(localPort);
+                int mreceiveport = rtpHandle.getAvailablePort(localPort);
 
-                mRtpHandle = rtpHandle.initReceiveAndSendHandle(localIP, mport, remoteIp, remotePort, IpCameraHelper.this);
+                int msendport = rtpHandle.getAvailablePort(mreceiveport+2);
+
+                mRtpHandle = rtpHandle.initReceiveAndSendHandle(localIP, mreceiveport,msendport, remoteIp, remotePort, IpCameraHelper.this);
                 if (mRtpHandle == 0) {
                     rtpHandle = null;
                     LogUtil.d(TAG, "JNI init error");
                     return;
                 }
                 LogUtil.d(TAG, "JNI init ok");
-                RtpData rtpData;
+                RtpData rtpData = null;
                 while (isRunning) {
-                    rtpData = rtpDataQueue.poll();
+                    try {
+                        rtpData = rtpDataQueue.take();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    LogUtil.d(TAG, "DataQueue size : " + rtpDataQueue.size());
                     if (rtpData != null && rtpHandle != null && mRtpHandle != 0) {
-                        rtpHandle.sendByte(mRtpHandle, rtpData.data, rtpData.length, rtpData.isMark, true);
+                        rtpHandle.sendByte(mRtpHandle, rtpData.data, rtpData.length, rtpData.isMark, true,rtpData.lastTime);
                     }
                     rtpData = null;
                 }
@@ -133,13 +140,13 @@ public class IpCameraHelper implements RtpListener, RtspEventListener {
     private int mCount = 0;
 
     @Override
-    public void receiveRtpData(byte[] rtp_data, int pkg_size, boolean isMarker) {
+    public void receiveRtpData(byte[] rtp_data, int pkg_size, boolean isMarker, long lastTime) {
         if (mCount % 100 == 0) {
             mCount = 0;
             System.out.println("收到 【RTP】" + pkg_size);
         }
         mCount++;
-        addDataToQueue(new RtpData(rtp_data, pkg_size, isMarker));
+        addDataToQueue(new RtpData(rtp_data, pkg_size, isMarker, lastTime));
     }
 
     private void addDataToQueue(RtpData rtpData) {

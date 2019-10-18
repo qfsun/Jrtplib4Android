@@ -1,4 +1,5 @@
 #include <RtpReceiver.h>
+#include <sys/time.h>
 
 #define H264               96
 #define SSRC           100
@@ -10,7 +11,7 @@ ReceiveCallback::ReceiveCallback(_JNIEnv *env, jobject obj) {
         loge("get jclass wrong");
         return;
     }
-    jmid_rtp = env->GetMethodID(clz, "receiveRtpData", "([BIZ)V");
+    jmid_rtp = env->GetMethodID(clz, "receiveRtpData", "([BIZJ)V");
     if (!jmid_rtp) {
         loge("get jmethodID jmid_rtp wrong");
         return;
@@ -44,14 +45,14 @@ void callbackRtcp(JNIEnv *env, int r_type, uint32_t r_ip, ReceiveCallback *hid_c
 }
 
 //回调java监听
-void callbackRtp(JNIEnv *env, uint8_t *buff, int packet_length, bool isMarker,
+void callbackRtp(JNIEnv *env, uint8_t *buff, int packet_length, bool isMarker,long m_time,
                  ReceiveCallback *hid_callback) {
     if (NULL != env) {
         //没有主动调用停止，才可以回调数据
         jbyteArray jbarray = env->NewByteArray(packet_length);
         env->SetByteArrayRegion(jbarray, 0, packet_length, (jbyte *) buff);
         env->CallVoidMethod(hid_callback->jobj, hid_callback->jmid_rtp, jbarray,
-                            packet_length, isMarker);
+                            packet_length, isMarker,m_time);
         env->DeleteLocalRef(jbarray);
     }
 }
@@ -110,7 +111,7 @@ bool CRTPReceiver::fini(JNIEnv *env) {
 //        env->DeleteGlobalRef(g_jobj);
 //        loge("DeleteGlobalRef.\n");
 //    }
-    BYEDestroy(RTPTime(2, 0), 0, 0);
+    BYEDestroy(RTPTime(3, 0), 0, 0);
     loge("CRTPReceiver fini jni ok.\n");
     return true;
 }
@@ -193,10 +194,10 @@ void CRTPReceiver::processSourceData(RTPSourceData *srcdat, const char *funcName
         logd("%s.CRTPReceiver error \n", funcName);
         return;
     }
-    if (srcdat->IsOwnSSRC()) {
-        logd("%s CRTPReceiver error. is own ssrc \n", funcName);
-        return;
-    }
+//    if (srcdat->IsOwnSSRC()) {
+//        logd("%s CRTPReceiver error. is own ssrc \n", funcName);
+//        return;
+//    }
     uint32_t ip = 0;
     uint16_t port = 0;
     if (srcdat->GetRTPDataAddress() != 0) {
@@ -257,9 +258,13 @@ void CRTPReceiver::processRtpPacket(const RTPPacket *pack) {
         }
         m_lastSeq = seq;
         if (pack->GetPayloadType() == H264 && m_init && isAttach) {
+            struct timeval tv;
+            gettimeofday(&tv,NULL);
+            long currentTime = tv.tv_sec*1000 + tv.tv_usec/1000;
             //std::cout<<"Got H264 packet：êo " << rtppack.GetExtendedSequenceNumber() << " from SSRC " << srcdat.GetSSRC() <<std::endl;
-            callbackRtp(r_env, pack->GetPayloadData(), pack->GetPayloadLength(), pack->HasMarker(),
+            callbackRtp(r_env, pack->GetPayloadData(), pack->GetPayloadLength(), pack->HasMarker(),currentTime,
                         hid_callback);
+
         }
     } else {
         logd("CRTPReceiver processRtpPacket pack err. \n");

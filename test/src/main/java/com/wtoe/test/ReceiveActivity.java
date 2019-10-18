@@ -95,18 +95,18 @@ public class ReceiveActivity extends AppCompatActivity {
                     if (ipCameraHelper == null) {
                         ipCameraHelper = new IpCameraHelper(NetworkUtil.getInstance().getLocalIp(ReceiveActivity.this), Constants.localPort, Constants.remoteIp, Constants.remotePort);
                     }
-                    if (ipCameraHelper2 == null) {
-                        ipCameraHelper2 = new IpCameraHelper(NetworkUtil.getInstance().getLocalIp(ReceiveActivity.this), Constants.localPort+4, Constants.remoteIp, Constants.remotePort+2);
-                    }
+//                    if (ipCameraHelper2 == null) {
+//                        ipCameraHelper2 = new IpCameraHelper(NetworkUtil.getInstance().getLocalIp(ReceiveActivity.this), Constants.localPort+4, Constants.remoteIp, Constants.remotePort+2);
+//                    }
                     //如果勾选了使用rtsp，则初始化rtsp
                     if (useRtsp) {
                         String s = et_rtsp.getText().toString().trim();
                         ipCameraHelper.initRtspClient(s);
-                        ipCameraHelper2.initRtspClient(s);
+//                        ipCameraHelper2.initRtspClient(s);
                     }
                     //否则使用默认的接收数据
                     ipCameraHelper.initData();
-                    ipCameraHelper2.initData();
+//                    ipCameraHelper2.initData();
                 } else if (btn.getText().equals("停止")) {
                     btn.setText("开始");
                     new Thread(new Runnable() {

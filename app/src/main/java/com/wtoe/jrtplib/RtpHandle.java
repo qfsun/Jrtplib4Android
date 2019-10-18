@@ -32,12 +32,12 @@ public class RtpHandle {
     /**
      * 接收数据，并转发
      */
-    public static native long initReceiveAndSendHandle(String localhost, int localport, String desthost, int destport, RtpListener listener);
+    public static native long initReceiveAndSendHandle(String localhost, int localreceiveport, int localsendport, String desthost, int destport, RtpListener listener);
 
     /**
      * 发送数据
      */
-    public static native boolean sendByte(long rtpHandler, byte[] src, int byteLength, boolean isSpsOrMarker, boolean isRtpData);
+    public static native boolean sendByte(long rtpHandler, byte[] src, int byteLength, boolean isSpsOrMarker, boolean isRtpData,long lastTime);
 
     /**
      * 销毁资源

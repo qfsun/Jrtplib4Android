@@ -37,7 +37,7 @@ public:
 
     void SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOrPps);
 
-    void SendRtpData(unsigned char *m_rtpBuf, int buflen, bool isMarker);
+    void SendRtpData(unsigned char *m_rtpBuf, int buflen, bool isMarker,long lastTime);
 
     void SetParamsForSendingH264();
 

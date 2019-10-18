@@ -16,14 +16,18 @@ import android.view.SurfaceView;
 import android.widget.TextView;
 
 import com.wtoe.jrtplib.RtpHandle;
+import com.wtoe.osd.YuvOsdUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,7 +50,7 @@ public class CameraHelper implements RtpListener {
     private int m_framerate = 25;
 
     //比特率
-    private int m_biterate = 4 * 1024 * 1024;
+    private int m_biterate = 2 * 1024 * 1024;
 
     private byte[] sps;
     private byte[] pps;
@@ -61,11 +65,14 @@ public class CameraHelper implements RtpListener {
 
     private boolean isRunning;
 
-    private ArrayBlockingQueue<byte[]> nv12Queue = new ArrayBlockingQueue<>(20);
+    private int queueSize = 3000;
+    private ArrayBlockingQueue<byte[]> nv12Queue = new ArrayBlockingQueue<>(queueSize);
 
     private byte[] nv12 = new byte[m_width * m_height * 3 / 2];
 
     private long now;
+
+    private long yuvHander;
 
     private boolean isFirstFrame = true;
     private RtpHandle rtpUtils;
@@ -106,6 +113,9 @@ public class CameraHelper implements RtpListener {
 
     private ExecutorService encodeExecutor = Executors.newSingleThreadExecutor();
 
+    private byte[] outData;
+    private SimpleDateFormat mFormat;
+
     /**
      * 开启预览
      */
@@ -114,6 +124,10 @@ public class CameraHelper implements RtpListener {
             LogUtil.d(TAG, "startPreview");
             isRunning = true;
             initRtpUtils();
+//            String pattern = "yyyy年MM月dd日 HH:mm:ss";//日期格式 年月日
+            String pattern = "yyyy-MM-dd HH:mm:ss";//日期格式
+            mFormat = new SimpleDateFormat(pattern, Locale.CHINA);
+            yuvHander = YuvOsdUtils.initOsd(20, 50, pattern.length(), m_width, m_height, 0);
             int previewFormat = mCamera.getParameters().getPreviewFormat();
             Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
             int size = previewSize.width * previewSize.height * ImageFormat.getBitsPerPixel(previewFormat) / 8;
@@ -126,8 +140,13 @@ public class CameraHelper implements RtpListener {
                     encodeExecutor.execute(new Runnable() {
                         @Override
                         public void run() {
-                            swapNV21ToNV12(data, nv12, m_width, m_height);
-                            nv12Queue.offer(nv12);
+                            if (outData == null) {
+                                outData = new byte[data.length];
+                            }
+//                            swapNV21ToNV12(data, nv12, m_width, m_height);
+                            String date = mFormat.format(new Date());
+                            YuvOsdUtils.addOsd(yuvHander,data, outData, date);
+                            addDataToQueue(outData);
                         }
                     });
                     mCamera.addCallbackBuffer(data);
@@ -135,6 +154,18 @@ public class CameraHelper implements RtpListener {
             });
         }
     }
+
+    private void addDataToQueue(byte[] data) {
+        if (nv12Queue == null) {
+            return;
+        }
+        if (nv12Queue.size() >= queueSize) {
+            nv12Queue.poll();
+            LogUtil.e(TAG, "lostPacket");
+        }
+        nv12Queue.add(data);
+    }
+
 
     /**
      * 初始化jrtplib
@@ -145,15 +176,15 @@ public class CameraHelper implements RtpListener {
             public void run() {
                 rtpUtils = new RtpHandle();
                 Constants.localPort = rtpUtils.getAvailablePort(Constants.localPort);
-                LogUtil.d(TAG, "initRtpUtils  localPort : "+Constants.localPort+"    /  remote :" + Constants.remoteIp + ":" + Constants.remotePort);
+                LogUtil.d(TAG, "initRtpUtils  localPort : " + Constants.localPort + "    /  remote :" + Constants.remoteIp + ":" + Constants.remotePort);
                 mRtpHandle = rtpUtils.initSendHandle(Constants.localPort, Constants.remoteIp, Constants.remotePort, CameraHelper.this);
                 if (mRtpHandle == 0) {
                     LogUtil.d(TAG, "initRtpUtils error : " + mRtpHandle);
                     rtpUtils = null;
                     return;
                 }
-                Constants.remotePort += 2 ;
-                Constants.localPort +=2;
+                Constants.remotePort += 2;
+                Constants.localPort += 2;
                 LogUtil.d(TAG, "initRtpUtils ok : " + mRtpHandle);
             }
         }).start();
@@ -268,7 +299,7 @@ public class CameraHelper implements RtpListener {
                 @Override
                 public void run() {
                     if (rtpUtils != null) {
-                        rtpUtils.sendByte(mRtpHandle, h264Data, h264Data.length, isSpsOrPps, false);
+                        rtpUtils.sendByte(mRtpHandle, h264Data, h264Data.length, isSpsOrPps, false, 0);
                     }
                 }
             });
@@ -354,8 +385,9 @@ public class CameraHelper implements RtpListener {
             mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar);
             mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
 
-            mediaFormat.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
-            mediaFormat.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel41);
+//            mediaFormat.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
+//            mediaFormat.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel41);
+            mediaFormat.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR);
 
             mEncoder.setCallback(encodeCallback);
             mEncoder.configure(mediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
@@ -474,6 +506,8 @@ public class CameraHelper implements RtpListener {
                 rtpUtils = null;
                 mRtpHandle = 0;
             }
+            YuvOsdUtils.releaseOsd(yuvHander);
+            yuvHander = 0;
             isRunning = false;
         } catch (Exception e) {
             e.printStackTrace();
@@ -497,7 +531,7 @@ public class CameraHelper implements RtpListener {
     }
 
     @Override
-    public void receiveRtpData(byte[] rtp_data, int pkg_size, boolean isMarker) {
+    public void receiveRtpData(byte[] rtp_data, int pkg_size, boolean isMarker, long lastTime) {
         System.out.println("收到 【RTP】" + Arrays.toString(rtp_data));
     }
 

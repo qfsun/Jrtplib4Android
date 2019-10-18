@@ -47,13 +47,14 @@ void CRTPSender::OnRTCPCompoundPacket(RTCPCompoundPacket *pack, const RTPTime &r
     uint32_t rtcpIp = addr->GetIP();
     uint32_t port = addr->GetPort();
     logd(" OnRTCP. ip:0x%x port:%d\n", rtcpIp, port);
-    if (s_init && s_isAttach){
+    if (s_init && s_isAttach) {
         callbackRtcp(s_env, 1, rtcpIp, s_callback);
     }
 }
 
 bool
-CRTPSender::initParam(JavaVM *vm,JNIEnv *env,CRTPSender *sess, const char *host, uint16_t PORT_BASE,
+CRTPSender::initParam(JavaVM *vm, JNIEnv *env, CRTPSender *sess, const char *host,
+                      uint16_t PORT_BASE,
                       uint16_t DST_PORT, jobject listener) {
     logd("CRTPSender init jni!\n");
     if (s_init) {
@@ -111,10 +112,8 @@ CRTPSender::initParam(JavaVM *vm,JNIEnv *env,CRTPSender *sess, const char *host,
 
 bool CRTPSender::fini() {
     loge("CRTPSender fini jni!\n");
-    RTPIPv4Address addr(s_remoteIp, s_remotePort);
-    DeleteFromAcceptList(addr);
     s_init = false;
-    BYEDestroy(RTPTime(10, 0), 0, 0);
+    BYEDestroy(RTPTime(3, 0), 0, 0);
     loge("CRTPSender fini jni ok.\n");
     return true;
 }
@@ -287,7 +286,7 @@ void CRTPSender::SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOr
 }
 
 //转发rtp数据
-void CRTPSender::SendRtpData(unsigned char *m_rtpBuf, int buflen, bool isMarker) {
+void CRTPSender::SendRtpData(unsigned char *m_rtpBuf, int buflen, bool isMarker, long lastTime) {
     if (buflen < 4) {
         return;
     }
@@ -297,14 +296,21 @@ void CRTPSender::SendRtpData(unsigned char *m_rtpBuf, int buflen, bool isMarker)
     }
     mCount++;
     int status;
-    this->SetMaximumPacketSize(1500);
     if (isMarker) {
-        status = this->SendPacket((void *) m_rtpBuf, buflen, H264, isMarker, 3600);
+        this->SetDefaultMark(true);
+        this->SetDefaultTimestampIncrement(3600);//设置时间戳增加间隔
+        status = this->SendPacket((void *) m_rtpBuf, buflen);
         CheckError(status);
     } else {
-        status = this->SendPacket((void *) m_rtpBuf, buflen, H264, isMarker, 0);
+        this->SetDefaultMark(false);
+        this->SetDefaultTimestampIncrement(0);//设置时间戳增加间隔
+        status = this->SendPacket((void *) m_rtpBuf, buflen);
         CheckError(status);
     }
+//    struct timeval tv;
+//    gettimeofday(&tv, NULL);
+//    long currentTime = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+//    logd("CRTPSender SendRtpData  Time Differ : %ld \n", (currentTime - lastTime));
 }
 
 void CRTPSender::SetParamsForSendingH264() {
@@ -333,7 +339,7 @@ void CRTPSender::OnBYEPacket(RTPSourceData *srcdat) {
         logd("%s CRTPSender RTP/RTCP. error \n", "OnBYEPacket");
         return;
     }
-    if (s_init && s_isAttach){
+    if (s_init && s_isAttach) {
         callbackRtcp(s_env, 2, ip, s_callback);
     }
 }

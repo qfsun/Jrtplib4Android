@@ -3,7 +3,6 @@ package com.wtoe.test;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
 import android.view.SurfaceView;
@@ -82,8 +81,8 @@ public class SendActivity extends AppCompatActivity {
 
     private void initData() {
         helperRtpTestFront = new CameraHelper(this, sv_camera_front, Camera.CameraInfo.CAMERA_FACING_FRONT, tv_content);
-        SystemClock.sleep(2000);
-        helperRtpTestBack = new CameraHelper(this, sv_camera_back, Camera.CameraInfo.CAMERA_FACING_BACK, tv_content);
+//        SystemClock.sleep(2000);
+//        helperRtpTestBack = new CameraHelper(this, sv_camera_back, Camera.CameraInfo.CAMERA_FACING_BACK, tv_content);
     }
 
     private void fini() {
