@@ -155,8 +155,8 @@ jboolean finiHandle_(JNIEnv *env, jclass type, jlong rtpHandler) {
  * 第三个元素：C/C++中对应方法的指针。
  */
 JNINativeMethod methods[] = {
-        {"initSendHandle",           "(ILjava/lang/String;ILcom/wtoe/test/RtpListener;)J",                    (void *) initSendHandle_},
-        {"initReceiveAndSendHandle", "(Ljava/lang/String;IILjava/lang/String;ILcom/wtoe/test/RtpListener;)J", (void *) initReceiveAndSendHandle_},
+        {"initSendHandle",           "(ILjava/lang/String;ILcom/wtoe/jrtplib/RtpListener;)J",                    (void *) initSendHandle_},
+        {"initReceiveAndSendHandle", "(Ljava/lang/String;IILjava/lang/String;ILcom/wtoe/jrtplib/RtpListener;)J", (void *) initReceiveAndSendHandle_},
         {"sendByte",                 "(J[BIZZJ)Z",                                                            (void *) sendByte_},
         {"finiHandle",               "(J)Z",                                                                  (void *) finiHandle_},
 };
