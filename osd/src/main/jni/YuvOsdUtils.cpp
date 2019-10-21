@@ -7,7 +7,7 @@
 jlong initOsd_(JNIEnv *env, jclass type, jint osdOffX,
                jint osdOffY, jint patternLen, jint frameWidth,
                jint frameHeight, jint rotation_angle) {
-    YuvUtils *utils = new YuvUtils;
+    YuvUtils *utils = new YuvUtils();
     utils->initOsd(osdOffX, osdOffY, patternLen, frameWidth, frameHeight, rotation_angle);
     logd("initOsd");
     return (long) utils;
@@ -16,17 +16,10 @@ jlong initOsd_(JNIEnv *env, jclass type, jint osdOffX,
 void
 addOsd_(JNIEnv *env, jclass type, jlong yuvHander, jbyteArray yuv_in_data, jbyteArray yvu_out_data,
         jstring date_) {
-    jbyte *nv21Src = env->GetByteArrayElements(yuv_in_data, NULL);
-    jbyte *destData = env->GetByteArrayElements(yvu_out_data, NULL);
-    const jchar *date = env->GetStringChars(date_, NULL);
-
     if (yuvHander != 0) {
         YuvUtils *utils = (YuvUtils *) yuvHander;
-        utils->addOsd(nv21Src, destData, date);
+        utils->addOsd(env, yuv_in_data, yvu_out_data, date_);
     }
-    env->ReleaseByteArrayElements(yuv_in_data, nv21Src, 0);
-    env->ReleaseByteArrayElements(yvu_out_data, destData, 0);
-    env->ReleaseStringChars(date_, date);
 }
 
 jbyteArray argbIntToNV21Byte_(JNIEnv *env, jclass jclazz, jlong yuvHander, jintArray ints,
@@ -72,6 +65,7 @@ void nv21ToNv12_(JNIEnv *env, jclass type, jlong yuvHander, jbyteArray nv21Src_,
 
 void releaseOsd_(JNIEnv *env, jclass type, jlong yuvHander) {
     if (yuvHander != 0) {
+        logd("releaseOsd . yuvHander != 0");
         YuvUtils *utils = (YuvUtils *) yuvHander;
         utils->releaseOsd();
         delete utils;

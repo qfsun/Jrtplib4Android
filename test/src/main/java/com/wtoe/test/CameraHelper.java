@@ -72,7 +72,7 @@ public class CameraHelper implements RtpListener {
 
     private long now;
 
-    private long yuvHander;
+    private long yuvHander = 0;
 
     private boolean isFirstFrame = true;
     private RtpHandle rtpUtils;
@@ -127,7 +127,9 @@ public class CameraHelper implements RtpListener {
 //            String pattern = "yyyy年MM月dd日 HH:mm:ss";//日期格式 年月日
             String pattern = "yyyy-MM-dd HH:mm:ss";//日期格式
             mFormat = new SimpleDateFormat(pattern, Locale.CHINA);
+            yuvHander = 0;
             yuvHander = YuvOsdUtils.initOsd(20, 50, pattern.length(), m_width, m_height, 0);
+
             int previewFormat = mCamera.getParameters().getPreviewFormat();
             Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
             int size = previewSize.width * previewSize.height * ImageFormat.getBitsPerPixel(previewFormat) / 8;
@@ -145,7 +147,9 @@ public class CameraHelper implements RtpListener {
                             }
 //                            swapNV21ToNV12(data, nv12, m_width, m_height);
                             String date = mFormat.format(new Date());
-                            YuvOsdUtils.addOsd(yuvHander,data, outData, date);
+                            if (yuvHander != 0) {
+                                YuvOsdUtils.addOsd(yuvHander, data, outData, date);
+                            }
                             addDataToQueue(outData);
                         }
                     });
@@ -506,8 +510,10 @@ public class CameraHelper implements RtpListener {
                 rtpUtils = null;
                 mRtpHandle = 0;
             }
-            YuvOsdUtils.releaseOsd(yuvHander);
-            yuvHander = 0;
+            if (yuvHander != 0) {
+                YuvOsdUtils.releaseOsd(yuvHander);
+                yuvHander = 0;
+            }
             isRunning = false;
         } catch (Exception e) {
             e.printStackTrace();

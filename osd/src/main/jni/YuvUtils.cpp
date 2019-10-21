@@ -1,6 +1,8 @@
 #include <YuvUtils.h>
 #include "YuvUtils.h"
+#include<android/log.h>
 
+#define loge(...) __android_log_print(ANDROID_LOG_ERROR, "wtoe_yuv_osd", __VA_ARGS__)
 
 /**
  * 初始化工具
@@ -16,6 +18,7 @@ void YuvUtils::initOsd(jint osdOffX,
                        jint frameHeight, jint rotation_angle) {
 //    如果已经初始化，多次调用，则直接返回
     if (is_init) {
+        loge("YuvUtils Already init.");
         return;
     }
 
@@ -434,7 +437,12 @@ int getIndex(jchar c) {
  * @param destData  转换后的数据
  * @param date  当前的时间
  */
-void YuvUtils::addOsd(jbyte *nv21Src, jbyte *destData, const jchar *date) {
+void YuvUtils::addOsd(JNIEnv *env, jbyteArray yuv_in_data, jbyteArray yvu_out_data,
+                      jstring date_) {
+    jbyte *nv21Src = env->GetByteArrayElements(yuv_in_data, NULL);
+    jbyte *destData = env->GetByteArrayElements(yvu_out_data, NULL);
+    const jchar *date = env->GetStringChars(date_, NULL);
+
     int framesize = frame_width * frame_height;
 
     int newFrameW;
@@ -485,6 +493,9 @@ void YuvUtils::addOsd(jbyte *nv21Src, jbyte *destData, const jchar *date) {
         newFrameW = frame_height;
     }
 
+    if (mNumArrays == NULL) {
+        loge("mNumArrays == NULL");
+    }
     //添加时间水印
     jbyte *dest = destData;
     jbyte *start = dest + off_y * newFrameW;
@@ -504,6 +515,9 @@ void YuvUtils::addOsd(jbyte *nv21Src, jbyte *destData, const jchar *date) {
             }
         }
     }
+    env->ReleaseByteArrayElements(yuv_in_data, nv21Src, 0);
+    env->ReleaseByteArrayElements(yvu_out_data, destData, 0);
+    env->ReleaseStringChars(date_, date);
 }
 
 jbyteArray YuvUtils::argbIntToNV21Byte(JNIEnv *env, jintArray ints,
@@ -623,14 +637,11 @@ void YuvUtils::nv21ToNv12(jbyte *nv21Src, jbyte *nv12Dest, jint width, jint heig
 
 void YuvUtils::releaseOsd() {
     if (!is_init) {
+        loge("releaseOsd . is_init = false");
         return;
     }
-    free(mNumArrays);
     is_init = false;
-}
-
-YuvUtils::YuvUtils() {
-
+    free(mNumArrays);
 }
 
 

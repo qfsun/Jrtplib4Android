@@ -171,9 +171,9 @@ void CRTPSender::OnPollThreadStop() {
     }
 }
 
-void CRTPSender::SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOrPps) {
+bool CRTPSender::SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOrPps) {
     if (buflen < 4) {
-        return;
+        return false;
     }
     unsigned char *pSendbuf; //发送数据指针
     pSendbuf = m_h264Buf;
@@ -197,8 +197,7 @@ void CRTPSender::SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOr
         this->SetDefaultMark(false);
         memcpy(sendbuf, pSendbuf, buflen);
         status = this->SendPacket((void *) sendbuf, buflen);
-        CheckError(status);
-        return;
+        return CheckError(status);
     }
     if (buflen <= MAX_RTP_PKT_LENGTH) {
         this->SetDefaultMark(true);
@@ -211,7 +210,7 @@ void CRTPSender::SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOr
         //NALU头已经写到sendbuf[0]中，接下来则存放的是NAL的第一个字节之后的数据。所以从r的第二个字节开始复制
         memcpy(sendbuf + 1, pSendbuf, buflen);
         status = this->SendPacket((void *) sendbuf, buflen);
-        CheckError(status);
+        return CheckError(status);
     } else if (buflen >= MAX_RTP_PKT_LENGTH) {
         this->SetDefaultMark(false);
         //得到该nalu需要用多少长度为1400字节的RTP包来发送
@@ -236,7 +235,9 @@ void CRTPSender::SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOr
                 fu_hdr->TYPE = (char) (pSendbuf[0] & 0x1f);
                 memcpy(sendbuf + 2, &pSendbuf[t * MAX_RTP_PKT_LENGTH + 1], MAX_RTP_PKT_LENGTH);
                 status = this->SendPacket((void *) sendbuf, MAX_RTP_PKT_LENGTH + 2, H264, false, 0);
-                CheckError(status);
+                if(!CheckError(status)) {
+                    return false;
+                }
                 t++;
             } else if (t < k)//既不是第一片，也不是最后一片
             {
@@ -253,7 +254,9 @@ void CRTPSender::SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOr
                 fu_hdr->TYPE = (char) (pSendbuf[0] & 0x1f);
                 memcpy(sendbuf + 2, &pSendbuf[t * MAX_RTP_PKT_LENGTH + 1], MAX_RTP_PKT_LENGTH);
                 status = this->SendPacket((void *) sendbuf, MAX_RTP_PKT_LENGTH + 2, H264, false, 0);
-                CheckError(status);
+                if(!CheckError(status)) {
+                    return false;
+                }
                 t++;
             }
                 //最后一包
@@ -278,7 +281,9 @@ void CRTPSender::SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOr
                 fu_hdr->E = 1;
                 memcpy(sendbuf + 2, &pSendbuf[t * MAX_RTP_PKT_LENGTH + 1], iSendLen - 1);
                 status = this->SendPacket((void *) sendbuf, iSendLen - 1 + 2, H264, true, 3600);
-                CheckError(status);
+                if(!CheckError(status)) {
+                    return false;
+                }
                 t++;
             }
         }
@@ -286,9 +291,9 @@ void CRTPSender::SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOr
 }
 
 //转发rtp数据
-void CRTPSender::SendRtpData(unsigned char *m_rtpBuf, int buflen, bool isMarker, long lastTime) {
+bool CRTPSender::SendRtpData(unsigned char *m_rtpBuf, int buflen, bool isMarker, long lastTime) {
     if (buflen < 4) {
-        return;
+        return false;
     }
     if (mCount % 100 == 0) {
         logd("CRTPSender SendRtpData packet length %d \n", buflen);
@@ -300,12 +305,12 @@ void CRTPSender::SendRtpData(unsigned char *m_rtpBuf, int buflen, bool isMarker,
         this->SetDefaultMark(true);
         this->SetDefaultTimestampIncrement(3600);//设置时间戳增加间隔
         status = this->SendPacket((void *) m_rtpBuf, buflen);
-        CheckError(status);
+        return CheckError(status);
     } else {
         this->SetDefaultMark(false);
         this->SetDefaultTimestampIncrement(0);//设置时间戳增加间隔
         status = this->SendPacket((void *) m_rtpBuf, buflen);
-        CheckError(status);
+        return CheckError(status);
     }
 //    struct timeval tv;
 //    gettimeofday(&tv, NULL);

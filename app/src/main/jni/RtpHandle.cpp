@@ -103,13 +103,19 @@ jboolean sendByte_
     m_Count++;
     CRTPSender *crtpSender = (CRTPSender *) (handle->sender);
     jbyte *src = env->GetByteArrayElements(_src, NULL);
+    bool sendResult;
     if (isRtpData) {
-        crtpSender->SendRtpData((unsigned char *) src, _byteLength, isSpsOrMarker, lastTime);
+        sendResult = crtpSender->SendRtpData((unsigned char *) src, _byteLength, isSpsOrMarker,
+                                             lastTime);
     } else {
-        crtpSender->SendH264Nalu((unsigned char *) src, _byteLength, isSpsOrMarker);
+        sendResult = crtpSender->SendH264Nalu((unsigned char *) src, _byteLength, isSpsOrMarker);
     }
-    env->ReleaseByteArrayElements(_src, src, 0);
-    return (jboolean) true;
+    if (sendResult) {
+        env->ReleaseByteArrayElements(_src, src, 0);
+        return (jboolean) true;
+    } else {
+        return (jboolean) false;
+    }
 }
 
 jboolean finiHandle_(JNIEnv *env, jclass type, jlong rtpHandler) {
@@ -151,8 +157,8 @@ jboolean finiHandle_(JNIEnv *env, jclass type, jlong rtpHandler) {
 JNINativeMethod methods[] = {
         {"initSendHandle",           "(ILjava/lang/String;ILcom/wtoe/test/RtpListener;)J",                    (void *) initSendHandle_},
         {"initReceiveAndSendHandle", "(Ljava/lang/String;IILjava/lang/String;ILcom/wtoe/test/RtpListener;)J", (void *) initReceiveAndSendHandle_},
-        {"sendByte",                 "(J[BIZZJ)Z",                                                               (void *) sendByte_},
-        {"finiHandle",               "(J)Z",                                                                     (void *) finiHandle_},
+        {"sendByte",                 "(J[BIZZJ)Z",                                                            (void *) sendByte_},
+        {"finiHandle",               "(J)Z",                                                                  (void *) finiHandle_},
 };
 
 /**

@@ -11,13 +11,9 @@ extern "C" {
 #endif
 
 class YuvUtils {
-
-public:
-    YuvUtils();
-
 public:
     void initOsd(jint osdOffX, jint osdOffY, jint patternLen, jint frameWidth, jint frameHeight, jint rotation_angle);
-    void addOsd(jbyte *nv21Src, jbyte *destData,const jchar *date);
+    void addOsd(JNIEnv *env,jbyteArray yuv_in_data, jbyteArray yvu_out_data,jstring date_);
     jbyteArray argbIntToNV21Byte( JNIEnv *env,jintArray ints,jint width, jint height);
     jbyteArray argbIntToNV12Byte(JNIEnv *env,jintArray ints,jint width, jint height);
     jbyteArray argbIntToGrayNVByte(JNIEnv *env,jintArray ints,jint width, jint height);
