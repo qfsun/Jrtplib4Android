@@ -11,7 +11,7 @@ int m_Count;
 
 jlong initSendHandle_
         (JNIEnv *env, jclass type, jint _localport, jstring _desthost, jint _destport,
-         jobject listener) {
+         jobject listener,jint _framerate) {
     //创建Handle
     RtpHandle *handle = new RtpHandle();
 
@@ -22,8 +22,7 @@ jlong initSendHandle_
     const char *desthost = env->GetStringUTFChars(_desthost, 0);
 
     //初始化发送端参数
-    bool flag = crtpSender->initParam(g_jvm, env, crtpSender, desthost, _localport, _destport,
-                                      listener);
+    bool flag = crtpSender->initParam(g_jvm, env, crtpSender, desthost, _localport, _destport,listener,_framerate);
     //释放资源
     env->ReleaseStringUTFChars(_desthost, desthost);
     //如果初始化失败，删除资源
@@ -33,12 +32,36 @@ jlong initSendHandle_
     handle->sender = (jlong) crtpSender;
     return (jlong) handle;
 }
+jlong initReceiveHandle_
+        (JNIEnv *env, jclass type, jstring _localhost, jint _localreceiveport,
+         jobject listener) {
+    //创建Handle
+    RtpHandle *handle = new RtpHandle();
+    //创建接收端
+    CRTPReceiver *crtpReceiver = new CRTPReceiver;
+
+    //转换本地IP
+    const char *localhost = env->GetStringUTFChars(_localhost, 0);
+
+    //初始化接收端参数
+    bool flag_receive = crtpReceiver->init(g_jvm, env, crtpReceiver, localhost, _localreceiveport,
+                                           listener);
+    //释放资源
+    env->ReleaseStringUTFChars(_localhost, localhost);
+
+    //如果初始化失败，删除资源
+    if (!flag_receive) {
+        return 0;
+    }
+    handle->receiver = (jlong) crtpReceiver;
+    return (jlong) handle;
+}
 
 jlong initReceiveAndSendHandle_
         (JNIEnv *env, jclass type, jstring _localhost, jint _localreceiveport,
          jint _localsendport,
          jstring _desthost,
-         jint _destport, jobject listener) {
+         jint _destport, jobject listener,jint _framerate) {
     //创建Handle
     RtpHandle *handle = new RtpHandle();
 
@@ -50,7 +73,7 @@ jlong initReceiveAndSendHandle_
 
     //初始化发送端参数
     bool flag = crtpSender->initParam(g_jvm, env, crtpSender, desthost, _localsendport, _destport,
-                                      listener);
+                                      listener,_framerate);
     //释放资源
     env->ReleaseStringUTFChars(_desthost, desthost);
 
@@ -155,8 +178,9 @@ jboolean finiHandle_(JNIEnv *env, jclass type, jlong rtpHandler) {
  * 第三个元素：C/C++中对应方法的指针。
  */
 JNINativeMethod methods[] = {
-        {"initSendHandle",           "(ILjava/lang/String;ILcom/wtoe/jrtplib/RtpListener;)J",                    (void *) initSendHandle_},
-        {"initReceiveAndSendHandle", "(Ljava/lang/String;IILjava/lang/String;ILcom/wtoe/jrtplib/RtpListener;)J", (void *) initReceiveAndSendHandle_},
+        {"initSendHandle",           "(ILjava/lang/String;ILcom/wtoe/jrtplib/RtpListener;I)J",                    (void *) initSendHandle_},
+        {"initReceiveHandle",           "(Ljava/lang/String;ILcom/wtoe/jrtplib/RtpListener;)J",                    (void *) initReceiveHandle_},
+        {"initReceiveAndSendHandle", "(Ljava/lang/String;IILjava/lang/String;ILcom/wtoe/jrtplib/RtpListener;I)J", (void *) initReceiveAndSendHandle_},
         {"sendByte",                 "(J[BIZZJ)Z",                                                            (void *) sendByte_},
         {"finiHandle",               "(J)Z",                                                                  (void *) finiHandle_},
 };

@@ -4,13 +4,13 @@
 #include <jni.h>
 
 #include "jthread/jthread.h"
-#include "jrtplib3/rtpsession.h"
-#include "jrtplib3/rtpudpv4transmitter.h"
-#include "jrtplib3/rtpsessionparams.h"
-#include "jrtplib3/rtpipv4address.h"
-#include "jrtplib3/rtpsourcedata.h"
-#include "jrtplib3/rtppacket.h"
-#include "jrtplib3/rtptimeutilities.h"
+#include "JRTPLIB/src/rtpsession.h"
+#include "JRTPLIB/src/rtpudpv4transmitter.h"
+#include "JRTPLIB/src/rtpsessionparams.h"
+#include "JRTPLIB/src/rtpipv4address.h"
+#include "JRTPLIB/src/rtpsourcedata.h"
+#include "JRTPLIB/src/rtppacket.h"
+#include "JRTPLIB/src/rtptimeutilities.h"
 #include "send-callback.h"
 #include "RtpCommon.h"
 #include <string.h>
@@ -31,7 +31,7 @@ protected:
                               const RTPAddress *senderaddress);
 
 public:
-    bool initParam(JavaVM *vm,JNIEnv *env,CRTPSender *sess, const char *destip, uint16_t PORT_BASE, uint16_t DST_PORT,jobject listener);
+    bool initParam(JavaVM *vm,JNIEnv *env,CRTPSender *sess, const char *destip, uint16_t PORT_BASE, uint16_t DST_PORT,jobject listener,uint16_t _framerate);
 
     bool fini();
 
@@ -79,6 +79,7 @@ private:
     uint32_t s_remoteIp;
     uint16_t s_remotePort;
     int mCount = 0;
+    int mFrameRate = 0;
     jobject s_jobj = NULL;
     SendCallback *s_callback;
     bool s_isAttach;

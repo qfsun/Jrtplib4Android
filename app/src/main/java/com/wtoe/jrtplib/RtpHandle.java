@@ -27,12 +27,17 @@ public class RtpHandle {
     /**
      * 只发送数据，不做接收处理
      */
-    public static native long initSendHandle(int localport, String desthost, int destport, RtpListener listener);
+    public static native long initSendHandle(int localport, String desthost, int destport, RtpListener listener, int framerate);
+
+    /**
+     * 只接收处理
+     */
+    public static native long initReceiveHandle(String localhost, int localreceiveport, RtpListener listener);
 
     /**
      * 接收数据，并转发
      */
-    public static native long initReceiveAndSendHandle(String localhost, int localreceiveport, int localsendport, String desthost, int destport, RtpListener listener);
+    public static native long initReceiveAndSendHandle(String localhost, int localreceiveport, int localsendport, String desthost, int destport, RtpListener listener, int framerate);
 
     /**
      * 发送数据

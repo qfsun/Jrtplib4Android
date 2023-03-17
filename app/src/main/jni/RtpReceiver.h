@@ -4,11 +4,11 @@
 #include <jni.h>
 
 #include "jthread/jthread.h"
-#include "jrtplib3/rtpsession.h"
-#include"jrtplib3/rtpudpv4transmitter.h"
-#include "jrtplib3/rtpsessionparams.h"
-#include "jrtplib3/rtpipv4address.h"
-#include "jrtplib3/rtpsourcedata.h"
+#include "JRTPLIB/src/rtpsession.h"
+#include"JRTPLIB/src/rtpudpv4transmitter.h"
+#include "JRTPLIB/src/rtpsessionparams.h"
+#include "JRTPLIB/src/rtpipv4address.h"
+#include "JRTPLIB/src/rtpsourcedata.h"
 #include "receive-callback.h"
 #include "RtpCommon.h"
 #include <arpa/inet.h>
@@ -34,7 +34,7 @@ protected:
 
 public:
     bool
-    init(JavaVM *vm,JNIEnv *env,CRTPReceiver *receiver, const char *destip, uint16_t PORT_BASE,
+    init(JavaVM *vm, JNIEnv *env, CRTPReceiver *receiver, const char *destip, uint16_t PORT_BASE,
          jobject listener);
 
     bool fini(JNIEnv *env);

@@ -3,7 +3,7 @@
     This file is a part of the JThread package, which contains some object-
     oriented thread wrappers for different thread implementations.
 
-    Copyright (c) 2000-2011  Jori Liesenborgs (jori.liesenborgs@gmail.com)
+    Copyright (c) 2000-2017  Jori Liesenborgs (jori.liesenborgs@gmail.com)
 
     Permission is hereby granted, free of charge, to any person obtaining a
     copy of this software and associated documentation files (the "Software"),
@@ -29,20 +29,17 @@
 
 #define JTHREAD_JTHREAD_H
 
-#include "jthreadconfig.h"
 #include "jmutex.h"
 
 #define ERR_JTHREAD_CANTINITMUTEX						-1
 #define ERR_JTHREAD_CANTSTARTTHREAD						-2
-#define ERR_JTHREAD_THREADFUNCNOTSET						-3
+#define ERR_JTHREAD_THREADFUNCNOTSET					-3
 #define ERR_JTHREAD_NOTRUNNING							-4
 #define ERR_JTHREAD_ALREADYRUNNING						-5
 
-namespace jthread
-{
+namespace jthread {
 
-class JTHREAD_IMPORTEXPORT JThread
-{
+class JThread {
 public:
 	JThread();
 	virtual ~JThread();
@@ -51,24 +48,14 @@ public:
 	virtual void *Thread() = 0;
 	bool IsRunning();
 	void *GetReturnValue();
+	bool IsSameThread();
+
 protected:
 	void ThreadStarted();
-private:
 
-#ifdef JTHREAD_CONFIG_WIN32THREADS
-#ifdef _WIN32_WCE
-	DWORD threadid;
-	static DWORD WINAPI TheThread(void *param);
-#else
-	static UINT __stdcall TheThread(void *param);
-	UINT threadid;
-#endif // _WIN32_WCE
-	HANDLE threadhandle;
-#else // pthread type threads
+private:
 	static void *TheThread(void *param);
-	
 	pthread_t threadid;
-#endif // JTHREAD_CONFIG_WIN32THREADS
 	void *retval;
 	bool running;
 	

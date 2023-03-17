@@ -8,7 +8,7 @@
 #include <exception>
 #include <math.h>
 
-#include "jrtplib3/rtpsession.h"
+#include "JRTPLIB/src/rtpsession.h"
 
 #ifndef JRTPLIB_RTPCOMMON_H
 #define JRTPLIB_RTPCOMMON_H

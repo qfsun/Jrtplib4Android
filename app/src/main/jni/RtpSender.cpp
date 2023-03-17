@@ -1,7 +1,7 @@
 #include "RtpSender.h"
 
-#define MAX_RTP_PKT_LENGTH 1300
-#define SEND_LENGTH        1400
+#define MAX_RTP_PKT_LENGTH 1100
+#define SEND_LENGTH        1150
 #define H264               96
 #define SSRC               100
 
@@ -55,7 +55,7 @@ void CRTPSender::OnRTCPCompoundPacket(RTCPCompoundPacket *pack, const RTPTime &r
 bool
 CRTPSender::initParam(JavaVM *vm, JNIEnv *env, CRTPSender *sess, const char *host,
                       uint16_t PORT_BASE,
-                      uint16_t DST_PORT, jobject listener) {
+                      uint16_t DST_PORT, jobject listener,uint16_t _framerate) {
     logd("CRTPSender init jni!\n");
     if (s_init) {
         loge("CRTPReceiver already init. \n");
@@ -63,6 +63,9 @@ CRTPSender::initParam(JavaVM *vm, JNIEnv *env, CRTPSender *sess, const char *hos
     }
     if (s_jobj == NULL) {
         s_jobj = env->NewGlobalRef(listener);
+    }
+    if (_framerate){
+       mFrameRate = _framerate;
     }
     s_env = env;
     s_callback = new SendCallback(env, s_jobj);
@@ -79,7 +82,7 @@ CRTPSender::initParam(JavaVM *vm, JNIEnv *env, CRTPSender *sess, const char *hos
     }
     /* set h264 param */
     sessparams.SetUsePredefinedSSRC(true);  //设置使用预先定义的SSRC
-    sessparams.SetOwnTimestampUnit(1.0 / 9000.0); /* 设置采样间隔 */
+    sessparams.SetOwnTimestampUnit(1.0 / 90000.0); /* 设置采样间隔 */
     sessparams.SetAcceptOwnPackets(false);   //接收自己发送的数据包
     sessparams.SetPredefinedSSRC(SSRC);     //定义SSRC
 
@@ -280,7 +283,12 @@ bool CRTPSender::SendH264Nalu(unsigned char *m_h264Buf, int buflen, bool isSpsOr
                 fu_hdr->TYPE = (char) (pSendbuf[0] & 0x1f);
                 fu_hdr->E = 1;
                 memcpy(sendbuf + 2, &pSendbuf[t * MAX_RTP_PKT_LENGTH + 1], iSendLen - 1);
-                status = this->SendPacket((void *) sendbuf, iSendLen - 1 + 2, H264, true, 3600);
+//                最后一个参数，根据90000/帧率 得出，现在设置的是30帧率的
+                int pts = 3000;
+                if (mFrameRate > 0){
+                    pts = 90000 / mFrameRate;
+                }
+                status = this->SendPacket((void *) sendbuf, iSendLen - 1 + 2, H264, true, pts);
                 if(!CheckError(status)) {
                     return false;
                 }
@@ -303,7 +311,11 @@ bool CRTPSender::SendRtpData(unsigned char *m_rtpBuf, int buflen, bool isMarker,
     int status;
     if (isMarker) {
         this->SetDefaultMark(true);
-        this->SetDefaultTimestampIncrement(3600);//设置时间戳增加间隔
+        int pts = 3000;
+        if (mFrameRate > 0){
+            pts = 90000 / mFrameRate;
+        }
+        this->SetDefaultTimestampIncrement(pts);//设置时间戳增加间隔
         status = this->SendPacket((void *) m_rtpBuf, buflen);
         return CheckError(status);
     } else {
@@ -321,8 +333,12 @@ bool CRTPSender::SendRtpData(unsigned char *m_rtpBuf, int buflen, bool isMarker,
 void CRTPSender::SetParamsForSendingH264() {
     this->SetDefaultPayloadType(H264);//设置传输类型
     this->SetDefaultMark(true);        //设置位
-    this->SetTimestampUnit(1.0 / 9000.0); //设置采样间隔
-    this->SetDefaultTimestampIncrement(3600);//设置时间戳增加间隔
+    this->SetTimestampUnit(1.0 / 90000.0); //设置采样间隔
+    int pts = 3000;
+    if (mFrameRate > 0){
+        pts = 90000 / mFrameRate;
+    }
+    this->SetDefaultTimestampIncrement(pts);//设置时间戳增加间隔
 }
 
 void CRTPSender::OnBYEPacket(RTPSourceData *srcdat) {
