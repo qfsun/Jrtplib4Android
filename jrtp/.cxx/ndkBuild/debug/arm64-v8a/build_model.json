@@ -1,0 +1,128 @@
+{
+  "abi": "ARM64_V8A",
+  "abiPlatformVersion": 21,
+  "buildSettings": {
+    "environmentVariables": []
+  },
+  "cxxBuildFolder": "F:\\workspace_android\\JRtpLib\\app\\.cxx\\ndkBuild\\debug\\arm64-v8a",
+  "info": {
+    "abi": "ARM64_V8A",
+    "bitness": 64,
+    "deprecated": false,
+    "default": true
+  },
+  "originalCxxBuildFolder": "F:\\workspace_android\\JRtpLib\\app\\.cxx\\ndkBuild\\debug\\arm64-v8a",
+  "variant": {
+    "buildSystemArgumentList": [],
+    "buildTargetSet": [],
+    "implicitBuildTargetSet": [],
+    "cFlagsList": [],
+    "cmakeSettingsConfiguration": "android-gradle-plugin-predetermined-name",
+    "cppFlagsList": [],
+    "isDebuggableEnabled": true,
+    "module": {
+      "buildSystem": "NDK_BUILD",
+      "cmakeToolchainFile": "F:\\Android\\Android-NDK\\android-ndk-r19c\\build\\cmake\\android.toolchain.cmake",
+      "cxxFolder": "F:\\workspace_android\\JRtpLib\\app\\.cxx",
+      "gradleModulePathName": ":app",
+      "intermediatesFolder": "F:\\workspace_android\\JRtpLib\\app\\build\\intermediates",
+      "makeFile": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk",
+      "moduleBuildFile": "F:\\workspace_android\\JRtpLib\\app\\build.gradle",
+      "moduleRootFolder": "F:\\workspace_android\\JRtpLib\\app",
+      "ndkDefaultAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkFolder": "F:\\Android\\Android-NDK\\android-ndk-r19c",
+      "ndkMetaAbiList": [
+        {
+          "abi": "ARMEABI_V7A",
+          "bitness": 32,
+          "deprecated": false,
+          "default": true
+        },
+        {
+          "abi": "ARM64_V8A",
+          "bitness": 64,
+          "deprecated": false,
+          "default": true
+        },
+        {
+          "abi": "X86",
+          "bitness": 32,
+          "deprecated": false,
+          "default": true
+        },
+        {
+          "abi": "X86_64",
+          "bitness": 64,
+          "deprecated": false,
+          "default": true
+        }
+      ],
+      "ndkMetaPlatforms": {
+        "min": 16,
+        "max": 28,
+        "aliases": {
+          "20": 19,
+          "25": 24,
+          "J": 16,
+          "J-MR1": 17,
+          "J-MR2": 18,
+          "K": 19,
+          "L": 21,
+          "L-MR1": 22,
+          "M": 23,
+          "N": 24,
+          "N-MR1": 24,
+          "O": 26,
+          "O-MR1": 27,
+          "P": 28
+        }
+      },
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultStl": "SYSTEM",
+      "ndkVersion": "19.2.5345600",
+      "project": {
+        "compilerSettingsCacheFolder": "F:\\workspace_android\\JRtpLib\\.cxx",
+        "cxxFolder": "F:\\workspace_android\\JRtpLib\\.cxx",
+        "isBuildOnlyTargetAbiEnabled": true,
+        "isCmakeBuildCohabitationEnabled": false,
+        "isNativeCompilerSettingsCacheEnabled": false,
+        "rootBuildGradleFolder": "F:\\workspace_android\\JRtpLib",
+        "sdkFolder": "F:\\Android\\sdk",
+        "isPrefabEnabled": false
+      },
+      "splitsAbiFilterSet": [],
+      "stlSharedObjectMap": {
+        "LIBCXX_SHARED": {
+          "ARMEABI_V7A": "F:\\Android\\Android-NDK\\android-ndk-r19c\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\arm-linux-androideabi\\libc++_shared.so",
+          "ARM64_V8A": "F:\\Android\\Android-NDK\\android-ndk-r19c\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\aarch64-linux-android\\libc++_shared.so",
+          "X86": "F:\\Android\\Android-NDK\\android-ndk-r19c\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\i686-linux-android\\libc++_shared.so",
+          "X86_64": "F:\\Android\\Android-NDK\\android-ndk-r19c\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\x86_64-linux-android\\libc++_shared.so"
+        },
+        "LIBCXX_STATIC": {},
+        "NONE": {},
+        "SYSTEM": {}
+      }
+    },
+    "objFolder": "F:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\debug\\obj\\local",
+    "variantName": "debug",
+    "validAbiList": [
+      "ARMEABI_V7A",
+      "ARM64_V8A",
+      "X86",
+      "X86_64"
+    ],
+    "prefabDirectory": "F:\\workspace_android\\JRtpLib\\app\\.cxx\\ndkBuild\\debug\\prefab",
+    "prefabPackageDirectoryList": []
+  },
+  "prefabFolder": "F:\\workspace_android\\JRtpLib\\app\\.cxx\\ndkBuild\\debug\\prefab\\arm64-v8a"
+}

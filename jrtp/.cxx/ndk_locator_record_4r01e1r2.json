@@ -1,0 +1,11 @@
+{
+  "ndk": "F:\\Android\\Android-NDK\\android-ndk-r12b",
+  "revision": {
+    "mMajor": 12,
+    "mMinor": 1,
+    "mMicro": 2977051,
+    "mPreview": 0,
+    "mPrecision": "MICRO",
+    "mPreviewSeparator": " "
+  }
+}

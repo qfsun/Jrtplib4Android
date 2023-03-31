@@ -1,0 +1,11 @@
+{
+  "ndk": "F:\\Android\\Android-NDK\\android-ndk-r19c",
+  "revision": {
+    "mMajor": 19,
+    "mMinor": 2,
+    "mMicro": 5345600,
+    "mPreview": 0,
+    "mPrecision": "MICRO",
+    "mPreviewSeparator": " "
+  }
+}

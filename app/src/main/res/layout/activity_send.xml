@@ -24,11 +24,16 @@
 
     <SurfaceView
         android:layout_below="@+id/btn_start"
-        android:id="@+id/sv_camera"
+        android:id="@+id/sv_camera_front"
         android:background="@color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-
+    <SurfaceView
+        android:layout_below="@+id/btn_start"
+        android:id="@+id/sv_camera_back"
+        android:background="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
     <TextView
         android:layout_below="@+id/btn_start"
         android:id="@+id/tv_content"

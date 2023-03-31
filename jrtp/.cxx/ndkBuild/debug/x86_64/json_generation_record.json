@@ -1,0 +1,62 @@
+[
+  {
+    "level": "INFO",
+    "message": "Start JSON generation. Platform version: 21 min SDK version: x86_64",
+    "file": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk",
+    "tag": "debug|x86_64"
+  },
+  {
+    "level": "INFO",
+    "message": "rebuilding JSON F:\\workspace_android\\JRtpLib\\app\\.cxx\\ndkBuild\\debug\\x86_64\\android_gradle_build.json due to:",
+    "file": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk",
+    "tag": "debug|x86_64"
+  },
+  {
+    "level": "INFO",
+    "message": "- expected json F:\\workspace_android\\JRtpLib\\app\\.cxx\\ndkBuild\\debug\\x86_64\\android_gradle_build.json file is not present, will remove stale json folder",
+    "file": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk",
+    "tag": "debug|x86_64"
+  },
+  {
+    "level": "INFO",
+    "message": "- missing previous command file F:\\workspace_android\\JRtpLib\\app\\.cxx\\ndkBuild\\debug\\x86_64\\build_command.txt, will remove stale json folder",
+    "file": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk",
+    "tag": "debug|x86_64"
+  },
+  {
+    "level": "INFO",
+    "message": "- command changed from previous, will remove stale json folder",
+    "file": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk",
+    "tag": "debug|x86_64"
+  },
+  {
+    "level": "INFO",
+    "message": "removing stale contents from \u0027F:\\workspace_android\\JRtpLib\\app\\.cxx\\ndkBuild\\debug\\x86_64\u0027",
+    "file": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk",
+    "tag": "debug|x86_64"
+  },
+  {
+    "level": "INFO",
+    "message": "created folder \u0027F:\\workspace_android\\JRtpLib\\app\\.cxx\\ndkBuild\\debug\\x86_64\u0027",
+    "file": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk",
+    "tag": "debug|x86_64"
+  },
+  {
+    "level": "INFO",
+    "message": "executing ndkBuild Executable : F:\\Android\\Android-NDK\\android-ndk-r19c\\ndk-build.cmd\narguments : \nNDK_PROJECT_PATH\u003dnull\nAPP_BUILD_SCRIPT\u003dF:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk\nNDK_APPLICATION_MK\u003dF:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Application.mk\nAPP_ABI\u003dx86_64\nNDK_ALL_ABIS\u003dx86_64\nNDK_DEBUG\u003d1\nAPP_PLATFORM\u003dandroid-21\nNDK_OUT\u003dF:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj\nNDK_LIBS_OUT\u003dF:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\debug\\lib\nAPP_SHORT_COMMANDS\u003dfalse\nLOCAL_SHORT_COMMANDS\u003dfalse\n-B\n-n\njvmArgs : \n\n",
+    "file": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk",
+    "tag": "debug|x86_64"
+  },
+  {
+    "level": "INFO",
+    "message": "Executable : F:\\Android\\Android-NDK\\android-ndk-r19c\\ndk-build.cmd\narguments : \nNDK_PROJECT_PATH\u003dnull\nAPP_BUILD_SCRIPT\u003dF:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk\nNDK_APPLICATION_MK\u003dF:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Application.mk\nAPP_ABI\u003dx86_64\nNDK_ALL_ABIS\u003dx86_64\nNDK_DEBUG\u003d1\nAPP_PLATFORM\u003dandroid-21\nNDK_OUT\u003dF:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj\nNDK_LIBS_OUT\u003dF:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\debug\\lib\nAPP_SHORT_COMMANDS\u003dfalse\nLOCAL_SHORT_COMMANDS\u003dfalse\n-B\n-n\njvmArgs : \n\n",
+    "file": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk",
+    "tag": "debug|x86_64"
+  },
+  {
+    "level": "INFO",
+    "message": "JSON generation completed with problem. Exception: Build command failed.\nError while executing process F:\\Android\\Android-NDK\\android-ndk-r19c\\ndk-build.cmd with arguments {NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dF:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dF:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dF:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dF:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\debug\\lib APP_SHORT_COMMANDS\u003dfalse LOCAL_SHORT_COMMANDS\u003dfalse -B -n}\nmd \"F:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\debug\\lib\\x86_64\" \u003eNUL 2\u003eNUL || rem\nF:/Android/Android-NDK/android-ndk-r19c/build//../prebuilt/windows-x86_64/bin/echo.exe [x86_64] \"Gdbserver      \": \"[x86_64-linux-android] F:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\debug\\lib/x86_64/gdbserver\"\ncopy /b/y \"F:\\Android\\Android-NDK\\android-ndk-r19c\\build\\\\..\\prebuilt\\android-x86_64\\gdbserver\\gdbserver\" \"F:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\debug\\lib\\x86_64\\gdbserver\" \u003e NUL\nF:/Android/Android-NDK/android-ndk-r19c/build//../prebuilt/windows-x86_64/bin/echo.exe [x86_64] \"Gdbsetup       \": \"F:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\debug\\lib/x86_64/gdb.setup\"\nF:/Android/Android-NDK/android-ndk-r19c/build//../prebuilt/windows-x86_64/bin/echo.exe \"set solib-search-path F:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj/local/x86_64\" \u003e F:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\debug\\lib/x86_64/gdb.setup\nF:/Android/Android-NDK/android-ndk-r19c/build//../prebuilt/windows-x86_64/bin/echo.exe \"directory F:/Android/Android-NDK/android-ndk-r19c/build//../toolchains/llvm/prebuilt/windows-x86_64/sysroot F:/Android/Android-NDK/android-ndk-r19c/build//../sources/cxx-stl/llvm-libc++ F:/Android/Android-NDK/android-ndk-r19c/build//../sources/cxx-stl/llvm-libc++abi/include F:/Android/Android-NDK/android-ndk-r19c/build//../sources/cxx-stl/llvm-libc++/include F:/workspace_android/JRtpLib/app/src/main/jni\" \u003e\u003e F:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\debug\\lib/x86_64/gdb.setup\nmd \"F:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\objs-debug\\rtp-handle\" \u003eNUL 2\u003eNUL || rem\nF:/Android/Android-NDK/android-ndk-r19c/build//../prebuilt/windows-x86_64/bin/echo.exe [x86_64] \"Compile++      \": \"rtp-handle \u003c\u003d RtpHandle.cpp\"\nF:/Android/Android-NDK/android-ndk-r19c/build//../toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe -MMD -MP -MF F:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj/local/x86_64/objs-debug/rtp-handle/RtpHandle.o.d -target x86_64-none-linux-android21 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes  --sysroot F:/Android/Android-NDK/android-ndk-r19c/build//../toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument  -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O0 -UNDEBUG -fno-limit-debug-info  -IF:/Android/Android-NDK/android-ndk-r19c/build//../sources/cxx-stl/llvm-libc++/include -IF:/Android/Android-NDK/android-ndk-r19c/build//../sources/cxx-stl/llvm-libc++abi/include -IF:/workspace_android/JRtpLib/app/src/main/jni -std\u003dc++11    -DANDROID  -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security   -c  F:/workspace_android/JRtpLib/app/src/main/jni/RtpHandle.cpp -o F:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj/local/x86_64/objs-debug/rtp-handle/RtpHandle.o\nF:/Android/Android-NDK/android-ndk-r19c/build//../prebuilt/windows-x86_64/bin/echo.exe [x86_64] \"Compile++      \": \"rtp-handle \u003c\u003d RtpReceiver.cpp\"\nF:/Android/Android-NDK/android-ndk-r19c/build//../toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe -MMD -MP -MF F:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj/local/x86_64/objs-debug/rtp-handle/RtpReceiver.o.d -target x86_64-none-linux-android21 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes  --sysroot F:/Android/Android-NDK/android-ndk-r19c/build//../toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument  -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O0 -UNDEBUG -fno-limit-debug-info  -IF:/Android/Android-NDK/android-ndk-r19c/build//../sources/cxx-stl/llvm-libc++/include -IF:/Android/Android-NDK/android-ndk-r19c/build//../sources/cxx-stl/llvm-libc++abi/include -IF:/workspace_android/JRtpLib/app/src/main/jni -std\u003dc++11    -DANDROID  -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security   -c  F:/workspace_android/JRtpLib/app/src/main/jni/RtpReceiver.cpp -o F:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj/local/x86_64/objs-debug/rtp-handle/RtpReceiver.o\nF:/Android/Android-NDK/android-ndk-r19c/build//../prebuilt/windows-x86_64/bin/echo.exe [x86_64] \"Compile++      \": \"rtp-handle \u003c\u003d RtpSender.cpp\"\nF:/Android/Android-NDK/android-ndk-r19c/build//../toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe -MMD -MP -MF F:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj/local/x86_64/objs-debug/rtp-handle/RtpSender.o.d -target x86_64-none-linux-android21 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes  --sysroot F:/Android/Android-NDK/android-ndk-r19c/build//../toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument  -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O0 -UNDEBUG -fno-limit-debug-info  -IF:/Android/Android-NDK/android-ndk-r19c/build//../sources/cxx-stl/llvm-libc++/include -IF:/Android/Android-NDK/android-ndk-r19c/build//../sources/cxx-stl/llvm-libc++abi/include -IF:/workspace_android/JRtpLib/app/src/main/jni -std\u003dc++11    -DANDROID  -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security   -c  F:/workspace_android/JRtpLib/app/src/main/jni/RtpSender.cpp -o F:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj/local/x86_64/objs-debug/rtp-handle/RtpSender.o\nF:/Android/Android-NDK/android-ndk-r19c/build//../prebuilt/windows-x86_64/bin/echo.exe [x86_64] \"Compile++      \": \"rtp-handle \u003c\u003d RtpCommon.cpp\"\nF:/Android/Android-NDK/android-ndk-r19c/build//../toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe -MMD -MP -MF F:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj/local/x86_64/objs-debug/rtp-handle/RtpCommon.o.d -target x86_64-none-linux-android21 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes  --sysroot F:/Android/Android-NDK/android-ndk-r19c/build//../toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument  -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O0 -UNDEBUG -fno-limit-debug-info  -IF:/Android/Android-NDK/android-ndk-r19c/build//../sources/cxx-stl/llvm-libc++/include -IF:/Android/Android-NDK/android-ndk-r19c/build//../sources/cxx-stl/llvm-libc++abi/include -IF:/workspace_android/JRtpLib/app/src/main/jni -std\u003dc++11    -DANDROID  -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security   -c  F:/workspace_android/JRtpLib/app/src/main/jni/RtpCommon.cpp -o F:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj/local/x86_64/objs-debug/rtp-handle/RtpCommon.o\n\nprocess_begin: CreateProcess(NULL, \"\", ...) failed.\nmake: *** No rule to make target `F:/workspace_android/JRtpLib/app/src/main/jni/rtcpapppacket.cpp\u0027, needed by `F:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/debug/obj/local/x86_64/objs-debug/rtp-handle/rtcpapppacket.o\u0027.  Stop.\n",
+    "file": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk",
+    "tag": "debug|x86_64"
+  }
+]

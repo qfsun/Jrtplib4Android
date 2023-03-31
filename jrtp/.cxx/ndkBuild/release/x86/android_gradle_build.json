@@ -1,0 +1,46 @@
+{
+  "buildFiles": [
+    "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk",
+    "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Application.mk"
+  ],
+  "cleanCommands": [
+    "F:\\Android\\sdk\\ndk\\21.4.7075529\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dF:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dF:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Application.mk APP_ABI\u003dx86 NDK_ALL_ABIS\u003dx86 NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dF:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dF:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\release\\lib clean"
+  ],
+  "buildTargetsCommand": "F:\\Android\\sdk\\ndk\\21.4.7075529\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dF:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dF:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Application.mk APP_ABI\u003dx86 NDK_ALL_ABIS\u003dx86 NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dF:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dF:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\release\\lib {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "rtp-handle-release-x86": {
+      "buildCommand": "F:\\Android\\sdk\\ndk\\21.4.7075529\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dF:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dF:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\Application.mk APP_ABI\u003dx86 NDK_ALL_ABIS\u003dx86 NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dF:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dF:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\release\\lib F:/workspace_android/JRtpLib/app/build/intermediates/ndkBuild/release/obj/local/x86/librtp-handle.so",
+      "toolchain": "toolchain-x86",
+      "abi": "x86",
+      "artifactName": "rtp-handle",
+      "files": [
+        {
+          "src": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\RtpCommon.cpp",
+          "flags": "-target i686-none-linux-android21 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot F:/Android/sdk/ndk/21.4.7075529/build//../toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -D_FORTIFY_SOURCE\u003d2 -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -IF:/Android/sdk/ndk/21.4.7075529/build//../sources/cxx-stl/llvm-libc++/include -IF:/Android/sdk/ndk/21.4.7075529/build//../sources/cxx-stl/llvm-libc++abi/include -IF:/workspace_android/JRtpLib/app/src/main/jni -DANDROID -nostdinc++ -Wformat -Werror\u003dformat-security -mstackrealign -fno-strict-aliasing"
+        },
+        {
+          "src": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\RtpHandle.cpp",
+          "flags": "-target i686-none-linux-android21 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot F:/Android/sdk/ndk/21.4.7075529/build//../toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -D_FORTIFY_SOURCE\u003d2 -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -IF:/Android/sdk/ndk/21.4.7075529/build//../sources/cxx-stl/llvm-libc++/include -IF:/Android/sdk/ndk/21.4.7075529/build//../sources/cxx-stl/llvm-libc++abi/include -IF:/workspace_android/JRtpLib/app/src/main/jni -DANDROID -nostdinc++ -Wformat -Werror\u003dformat-security -mstackrealign -fno-strict-aliasing"
+        },
+        {
+          "src": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\RtpReceiver.cpp",
+          "flags": "-target i686-none-linux-android21 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot F:/Android/sdk/ndk/21.4.7075529/build//../toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -D_FORTIFY_SOURCE\u003d2 -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -IF:/Android/sdk/ndk/21.4.7075529/build//../sources/cxx-stl/llvm-libc++/include -IF:/Android/sdk/ndk/21.4.7075529/build//../sources/cxx-stl/llvm-libc++abi/include -IF:/workspace_android/JRtpLib/app/src/main/jni -DANDROID -nostdinc++ -Wformat -Werror\u003dformat-security -mstackrealign -fno-strict-aliasing"
+        },
+        {
+          "src": "F:\\workspace_android\\JRtpLib\\app\\src\\main\\jni\\RtpSender.cpp",
+          "flags": "-target i686-none-linux-android21 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot F:/Android/sdk/ndk/21.4.7075529/build//../toolchains/llvm/prebuilt/windows-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -D_FORTIFY_SOURCE\u003d2 -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -IF:/Android/sdk/ndk/21.4.7075529/build//../sources/cxx-stl/llvm-libc++/include -IF:/Android/sdk/ndk/21.4.7075529/build//../sources/cxx-stl/llvm-libc++abi/include -IF:/workspace_android/JRtpLib/app/src/main/jni -DANDROID -nostdinc++ -Wformat -Werror\u003dformat-security -mstackrealign -fno-strict-aliasing"
+        }
+      ],
+      "output": "F:\\workspace_android\\JRtpLib\\app\\build\\intermediates\\ndkBuild\\release\\obj\\local\\x86\\librtp-handle.so"
+    }
+  },
+  "toolchains": {
+    "toolchain-x86": {
+      "cppCompilerExecutable": "F:\\Android\\sdk\\ndk\\21.4.7075529\\build\\..\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}
